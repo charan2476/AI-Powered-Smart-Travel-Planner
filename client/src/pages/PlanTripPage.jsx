@@ -15,12 +15,15 @@ import {
   Loader2,
   CheckCircle2,
   AlertCircle,
+  Globe,
+  Sliders,
 } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Select from '../components/Select';
 import MultiSelect from '../components/MultiSelect';
 import Card from '../components/Card';
+import FloatingTravelAsset from '../components/FloatingTravelAsset';
 
 export const PlanTripPage = () => {
   const [searchParams] = useSearchParams();
@@ -189,27 +192,27 @@ export const PlanTripPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10 lg:py-16">
+    <div className="min-h-screen bg-slate-50 py-10 lg:py-16 relative">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Page Header */}
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-50 text-sky-700 text-xs font-semibold mb-3 border border-sky-100">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-50 text-sky-700 text-xs font-bold mb-3 border border-sky-100 shadow-xs">
             <Sparkles className="w-3.5 h-3.5 text-sky-500" /> AI Itinerary Builder
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mb-3">
             Plan Your Next Adventure
           </h1>
-          <p className="text-sm text-slate-500">
-            Tell us your travel style and preferences. Our AI will curate a personalized day-by-day itinerary in seconds.
+          <p className="text-xs sm:text-sm text-slate-500">
+            Customize your travel preferences below. Our AI will curate a personalized day-by-day itinerary with budget allocation.
           </p>
         </div>
 
-        {/* Planning Form Card */}
-        <Card className="p-6 sm:p-10 shadow-card border-slate-200/80">
+        {/* Form Card */}
+        <Card glassEffect className="p-6 sm:p-10 shadow-card border-slate-200/90">
           <form onSubmit={handleGenerate} className="space-y-8">
             {/* Section 1: Destination */}
             <div className="space-y-4">
-              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
                 <MapPin className="w-4 h-4 text-sky-500" /> 1. Where are you going?
               </h3>
               <Input
@@ -226,7 +229,7 @@ export const PlanTripPage = () => {
             {/* Section 2: Dates & Duration */}
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
+                <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-sky-500" /> 2. When are you traveling?
                 </h3>
                 {duration > 0 && (
@@ -258,7 +261,7 @@ export const PlanTripPage = () => {
 
             {/* Section 3: Travelers & Budget */}
             <div className="space-y-4">
-              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
                 <Users className="w-4 h-4 text-sky-500" /> 3. Group Size & Budget
               </h3>
 
@@ -297,7 +300,7 @@ export const PlanTripPage = () => {
 
             {/* Section 4: Travel Style */}
             <div className="space-y-4">
-              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
                 <Compass className="w-4 h-4 text-sky-500" /> 4. Travel Style
               </h3>
 
@@ -309,10 +312,10 @@ export const PlanTripPage = () => {
                       type="button"
                       key={style}
                       onClick={() => setFormData({ ...formData, travelStyle: style })}
-                      className={`p-3.5 rounded-xl text-left border text-xs font-semibold transition-all ${
+                      className={`p-3.5 rounded-2xl text-left border text-xs font-bold transition-all duration-300 cursor-pointer select-none active:scale-95 ${
                         isSelected
-                          ? 'border-sky-500 bg-sky-50/70 text-sky-900 shadow-sm scale-[1.02]'
-                          : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                          ? 'btn-shimmer border-sky-500 bg-sky-50 text-sky-900 shadow-md shadow-sky-500/20 scale-[1.02]'
+                          : 'border-slate-200/90 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
@@ -327,7 +330,7 @@ export const PlanTripPage = () => {
 
             {/* Section 5: Interests */}
             <div className="space-y-4">
-              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
                 <Heart className="w-4 h-4 text-rose-500" /> 5. What are you interested in?
               </h3>
 
@@ -335,13 +338,13 @@ export const PlanTripPage = () => {
                 options={interestOptions}
                 selected={formData.interests}
                 onChange={(newInterests) => setFormData({ ...formData, interests: newInterests })}
-                helperText="Select all categories that you would like to include in your daily activities."
+                helperText="Select all activities that you would like included in your daily itinerary."
               />
             </div>
 
             {/* Submit Button */}
             <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-xs text-slate-500">
+              <div className="text-xs text-slate-500 font-medium">
                 ✨ AI will structure a complete {duration}-day schedule with cost breakdown.
               </div>
               <Button
@@ -349,7 +352,7 @@ export const PlanTripPage = () => {
                 size="lg"
                 variant="primary"
                 isLoading={isGenerating}
-                className="w-full sm:w-auto px-8 shadow-glow"
+                className="w-full sm:w-auto px-9 shadow-glow text-base"
                 icon={Sparkles}
               >
                 Generate My Trip ✨
@@ -359,49 +362,46 @@ export const PlanTripPage = () => {
         </Card>
       </div>
 
-      {/* AI Generating Loading Overlay */}
+      {/* AI Generating High-Tech Loading Modal */}
       {isGenerating && (
-        <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl border border-slate-100 space-y-6">
-            <div className="relative mx-auto w-20 h-20">
-              <div className="w-20 h-20 rounded-full border-4 border-sky-200 border-t-sky-500 animate-spin" />
-              <div className="absolute inset-0 flex items-center justify-center text-sky-600">
-                <Compass className="w-8 h-8 animate-pulse" />
-              </div>
+        <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="glass-dark rounded-3xl p-8 max-w-md w-full text-center shadow-2xl border border-white/10 space-y-6 text-white">
+            <div className="flex justify-center -mb-4">
+              <FloatingTravelAsset size={130} />
             </div>
 
             <div>
-              <h3 className="text-xl font-extrabold text-slate-900 mb-1">
+              <h3 className="text-xl font-black text-white mb-1.5 tracking-tight">
                 Creating your personalized itinerary...
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-300">
                 Tailoring activities, estimating budgets, and optimizing routes for {formData.destination}.
               </p>
             </div>
 
-            {/* Animated generation progress indicators */}
-            <div className="space-y-2 text-left bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                <span className="text-slate-700 font-medium">Analyzing preferences & {formData.travelStyle} style</span>
+            {/* Animated generation progress steps */}
+            <div className="space-y-2.5 text-left bg-white/5 p-4 rounded-2xl border border-white/10 text-xs">
+              <div className="flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <span className="text-slate-200 font-medium">Analyzing preferences & {formData.travelStyle} style</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 {generationStep >= 2 ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                 ) : (
-                  <Loader2 className="w-4 h-4 text-sky-500 animate-spin flex-shrink-0" />
+                  <Loader2 className="w-4 h-4 text-sky-400 animate-spin flex-shrink-0" />
                 )}
-                <span className={generationStep >= 2 ? 'text-slate-700 font-medium' : 'text-slate-400'}>
+                <span className={generationStep >= 2 ? 'text-slate-200 font-medium' : 'text-slate-400'}>
                   Balancing {formData.budget} {formData.currency} budget breakdown
                 </span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 {generationStep >= 3 ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                 ) : (
-                  <Loader2 className="w-4 h-4 text-sky-500 animate-spin flex-shrink-0" />
+                  <Loader2 className="w-4 h-4 text-sky-400 animate-spin flex-shrink-0" />
                 )}
-                <span className={generationStep >= 3 ? 'text-slate-700 font-medium' : 'text-slate-400'}>
+                <span className={generationStep >= 3 ? 'text-slate-200 font-medium' : 'text-slate-400'}>
                   Compiling day-by-day activities & packing tips
                 </span>
               </div>

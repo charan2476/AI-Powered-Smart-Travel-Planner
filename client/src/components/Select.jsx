@@ -20,15 +20,15 @@ export const Select = ({
       {label && (
         <label
           htmlFor={selectId}
-          className="block text-sm font-semibold text-slate-700 mb-1.5"
+          className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5"
         >
           {label} {required && <span className="text-rose-500">*</span>}
         </label>
       )}
-      <div className="relative rounded-xl shadow-sm">
+      <div className="relative rounded-xl transition-all group">
         {Icon && (
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-            <Icon className="h-5 h-5" />
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-sky-500 transition-colors">
+            <Icon className="h-4.5 w-4.5" />
           </div>
         )}
         <select
@@ -36,12 +36,12 @@ export const Select = ({
           value={value}
           onChange={onChange}
           required={required}
-          className={`block w-full rounded-xl border bg-white text-slate-900 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-0 appearance-none cursor-pointer ${
+          className={`block w-full rounded-xl border bg-white/90 backdrop-blur-sm text-slate-900 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-sky-200 focus:border-sky-500 hover:border-slate-300 shadow-sm appearance-none cursor-pointer ${
             Icon ? 'pl-11' : 'pl-3.5'
           } pr-9 py-2.5 ${
             error
-              ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200'
-              : 'border-slate-200 focus:border-sky-500 focus:ring-sky-100 hover:border-slate-300'
+              ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200 bg-rose-50/20'
+              : 'border-slate-200/90'
           } ${className}`}
           {...props}
         >

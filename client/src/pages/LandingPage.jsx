@@ -18,6 +18,8 @@ import Button from '../components/Button';
 import Card from '../components/Card';
 import { destinationService } from '../services/destinationService';
 import DestinationCard from '../components/DestinationCard';
+import VantaBackground from '../components/VantaBackground';
+import FloatingTravelAsset from '../components/FloatingTravelAsset';
 
 export const LandingPage = () => {
   const [popularDestinations, setPopularDestinations] = useState([]);
@@ -38,41 +40,47 @@ export const LandingPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 bg-gradient-to-b from-sky-50/70 via-white to-slate-50">
-        {/* Decorative background blurs */}
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-sky-300/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-32 right-10 w-[300px] h-[300px] bg-indigo-300/20 rounded-full blur-3xl pointer-events-none" />
-
+      {/* Hero Section with Vanta.js 3D Background */}
+      <VantaBackground className="py-16 sm:py-24 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-sky-200/80 shadow-soft text-sky-700 text-xs sm:text-sm font-semibold mb-8 animate-in fade-in slide-in-from-top-3 duration-500">
-            <Sparkles className="w-4 h-4 text-sky-500 animate-spin" />
-            <span>Next-Generation AI Travel Planner</span>
+          <div className="inline-flex items-center gap-2 px-4.5 py-2 rounded-full bg-white/10 backdrop-blur-md border border-sky-400/30 text-sky-300 text-xs sm:text-sm font-bold mb-8 shadow-lg shadow-sky-500/10 animate-in fade-in slide-in-from-top-3 duration-500">
+            <Sparkles className="w-4 h-4 text-sky-400 animate-pulse" />
+            <span>AI-Powered Smart Travel Planning</span>
+          </div>
+
+          {/* 3D Floating Visual Asset */}
+          <div className="flex justify-center -mb-2">
+            <FloatingTravelAsset size={150} />
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 max-w-4xl mx-auto leading-[1.15] mb-6">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white max-w-4xl mx-auto leading-[1.12] mb-6 drop-shadow-md">
             Plan Less.{' '}
-            <span className="bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-sky-400 via-teal-300 to-blue-400 bg-clip-text text-transparent">
               Travel More.
             </span>
           </h1>
 
           {/* Subheadline */}
-          <p className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto font-normal leading-relaxed mb-10">
+          <p className="text-base sm:text-xl text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed mb-10">
             Create personalized travel itineraries, manage your budget, and get intelligent travel assistance with TripGenie.
           </p>
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto mb-16">
             <Link to="/plan" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto text-base shadow-glow" icon={Sparkles}>
+              <Button size="lg" className="w-full sm:w-auto text-base shadow-glow px-8" icon={Sparkles}>
                 Plan My Trip
               </Button>
             </Link>
             <Link to="/explore" className="w-full sm:w-auto">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto text-base" icon={Globe}>
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto text-base bg-white/10 text-white border-white/20 hover:bg-white/20 hover:text-white"
+                icon={Globe}
+              >
                 Explore Destinations
               </Button>
             </Link>
@@ -80,36 +88,36 @@ export const LandingPage = () => {
 
           {/* Hero Feature Badges */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            <div className="flex items-center gap-3 p-3.5 bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-soft">
-              <div className="p-2 rounded-xl bg-sky-50 text-sky-600">
+            <div className="flex items-center gap-3 p-3.5 bg-slate-900/60 backdrop-blur-md rounded-2xl border border-white/10 text-white shadow-soft">
+              <div className="p-2 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-400/30">
                 <Zap className="w-4 h-4" />
               </div>
-              <span className="text-xs font-semibold text-slate-700 text-left">Instant Itinerary in 5 Seconds</span>
+              <span className="text-xs font-semibold text-slate-200 text-left">Instant Itinerary in 5s</span>
             </div>
-            <div className="flex items-center gap-3 p-3.5 bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-soft">
-              <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
+            <div className="flex items-center gap-3 p-3.5 bg-slate-900/60 backdrop-blur-md rounded-2xl border border-white/10 text-white shadow-soft">
+              <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30">
                 <DollarSign className="w-4 h-4" />
               </div>
-              <span className="text-xs font-semibold text-slate-700 text-left">Dynamic Budget Optimizer</span>
+              <span className="text-xs font-semibold text-slate-200 text-left">Dynamic Budget Plan</span>
             </div>
-            <div className="flex items-center gap-3 p-3.5 bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-soft">
-              <div className="p-2 rounded-xl bg-purple-50 text-purple-600">
+            <div className="flex items-center gap-3 p-3.5 bg-slate-900/60 backdrop-blur-md rounded-2xl border border-white/10 text-white shadow-soft">
+              <div className="p-2 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-400/30">
                 <Bot className="w-4 h-4" />
               </div>
-              <span className="text-xs font-semibold text-slate-700 text-left">24/7 AI Travel Assistant</span>
+              <span className="text-xs font-semibold text-slate-200 text-left">24/7 AI Concierge</span>
             </div>
-            <div className="flex items-center gap-3 p-3.5 bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-soft">
-              <div className="p-2 rounded-xl bg-amber-50 text-amber-600">
+            <div className="flex items-center gap-3 p-3.5 bg-slate-900/60 backdrop-blur-md rounded-2xl border border-white/10 text-white shadow-soft">
+              <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-400/30">
                 <Sliders className="w-4 h-4" />
               </div>
-              <span className="text-xs font-semibold text-slate-700 text-left">100% Editable & Custom</span>
+              <span className="text-xs font-semibold text-slate-200 text-left">100% Customizable</span>
             </div>
           </div>
         </div>
-      </section>
+      </VantaBackground>
 
       {/* Feature Section */}
-      <section className="py-20 bg-white border-y border-slate-200/60">
+      <section className="py-20 bg-white border-y border-slate-200/70">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <span className="text-xs font-bold uppercase tracking-wider text-sky-600 mb-2 block">
@@ -124,10 +132,9 @@ export const LandingPage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Feature 1 */}
-            <Card className="p-6 flex flex-col justify-between hover:border-sky-300">
+            <Card hoverEffect glassEffect className="p-6 flex flex-col justify-between">
               <div>
-                <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mb-5 border border-sky-100">
+                <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mb-5 border border-sky-100 shadow-xs">
                   <Sparkles className="w-6 h-6" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -139,10 +146,9 @@ export const LandingPage = () => {
               </div>
             </Card>
 
-            {/* Feature 2 */}
-            <Card className="p-6 flex flex-col justify-between hover:border-sky-300">
+            <Card hoverEffect glassEffect className="p-6 flex flex-col justify-between">
               <div>
-                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-5 border border-emerald-100">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-5 border border-emerald-100 shadow-xs">
                   <DollarSign className="w-6 h-6" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -154,10 +160,9 @@ export const LandingPage = () => {
               </div>
             </Card>
 
-            {/* Feature 3 */}
-            <Card className="p-6 flex flex-col justify-between hover:border-sky-300">
+            <Card hoverEffect glassEffect className="p-6 flex flex-col justify-between">
               <div>
-                <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-5 border border-purple-100">
+                <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-5 border border-purple-100 shadow-xs">
                   <Bot className="w-6 h-6" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -169,10 +174,9 @@ export const LandingPage = () => {
               </div>
             </Card>
 
-            {/* Feature 4 */}
-            <Card className="p-6 flex flex-col justify-between hover:border-sky-300">
+            <Card hoverEffect glassEffect className="p-6 flex flex-col justify-between">
               <div>
-                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-5 border border-amber-100">
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-5 border border-amber-100 shadow-xs">
                   <Compass className="w-6 h-6" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -203,7 +207,7 @@ export const LandingPage = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="relative bg-slate-800/80 p-6 rounded-2xl border border-slate-700/80">
+            <div className="relative bg-slate-800/80 p-6 rounded-3xl border border-slate-700/80 shadow-card">
               <span className="text-3xl font-black text-sky-400 mb-4 block">01</span>
               <h3 className="text-base font-bold text-white mb-2">Enter your preferences</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
@@ -211,7 +215,7 @@ export const LandingPage = () => {
               </p>
             </div>
 
-            <div className="relative bg-slate-800/80 p-6 rounded-2xl border border-slate-700/80">
+            <div className="relative bg-slate-800/80 p-6 rounded-3xl border border-slate-700/80 shadow-card">
               <span className="text-3xl font-black text-sky-400 mb-4 block">02</span>
               <h3 className="text-base font-bold text-white mb-2">Generate your itinerary</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
@@ -219,7 +223,7 @@ export const LandingPage = () => {
               </p>
             </div>
 
-            <div className="relative bg-slate-800/80 p-6 rounded-2xl border border-slate-700/80">
+            <div className="relative bg-slate-800/80 p-6 rounded-3xl border border-slate-700/80 shadow-card">
               <span className="text-3xl font-black text-sky-400 mb-4 block">03</span>
               <h3 className="text-base font-bold text-white mb-2">Customize your trip</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
@@ -227,7 +231,7 @@ export const LandingPage = () => {
               </p>
             </div>
 
-            <div className="relative bg-slate-800/80 p-6 rounded-2xl border border-slate-700/80">
+            <div className="relative bg-slate-800/80 p-6 rounded-3xl border border-slate-700/80 shadow-card">
               <span className="text-3xl font-black text-sky-400 mb-4 block">04</span>
               <h3 className="text-base font-bold text-white mb-2">Travel confidently</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
@@ -268,18 +272,18 @@ export const LandingPage = () => {
       )}
 
       {/* Bottom CTA Banner */}
-      <section className="py-16 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 text-white">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">
+      <section className="py-18 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 text-white relative overflow-hidden">
+        <div className="max-w-5xl mx-auto px-4 text-center relative z-10">
+          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 tracking-tight">
             Ready to design your next dream vacation?
           </h2>
           <p className="text-sky-100 text-sm sm:text-base max-w-xl mx-auto mb-8">
-            Join thousands of smart travelers planning their perfect getaways with TripGenie.
+            Join smart travelers worldwide planning their perfect getaways with TripGenie.
           </p>
           <Link to="/register">
             <Button
               size="lg"
-              className="bg-white text-slate-900 hover:bg-slate-100 shadow-xl font-bold"
+              className="bg-white text-slate-900 hover:bg-slate-100 shadow-xl font-bold px-8 text-base"
               icon={Sparkles}
             >
               Start Planning for Free

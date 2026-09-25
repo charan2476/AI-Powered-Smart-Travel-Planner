@@ -4,14 +4,21 @@ export const Card = ({
   children,
   className = '',
   hoverEffect = false,
+  glassEffect = true,
   onClick,
   ...props
 }) => {
   return (
     <div
       onClick={onClick}
-      className={`bg-white rounded-2xl border border-slate-200/80 shadow-soft overflow-hidden transition-all duration-300 ${
-        hoverEffect ? 'hover:shadow-card hover:-translate-y-1 hover:border-slate-300 cursor-pointer' : ''
+      className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
+        glassEffect
+          ? 'glass-card border-slate-200/80 shadow-soft'
+          : 'bg-white border-slate-200/80 shadow-soft'
+      } ${
+        hoverEffect
+          ? 'hover:shadow-card hover:-translate-y-1 hover:border-sky-300/80 cursor-pointer'
+          : ''
       } ${className}`}
       {...props}
     >
