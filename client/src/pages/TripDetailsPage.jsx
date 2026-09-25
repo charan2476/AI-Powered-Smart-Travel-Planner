@@ -1,0 +1,520 @@
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useToast } from '../context/ToastContext';
+import { tripService } from '../services/tripService';
+import {
+  MapPin,
+  Calendar,
+  Users,
+  DollarSign,
+  Compass,
+  Edit,
+  Trash2,
+  Plus,
+  Sparkles,
+  ArrowLeft,
+  CheckCircle2,
+  AlertTriangle,
+  Lightbulb,
+  Luggage,
+  Info,
+  Clock,
+} from 'lucide-react';
+import Button from '../components/Button';
+import Card from '../components/Card';
+import Input from '../components/Input';
+import Select from '../components/Select';
+import Modal from '../components/Modal';
+import LoadingSpinner from '../components/LoadingSpinner';
+import BudgetBreakdown from '../components/BudgetBreakdown';
+import ItineraryDay from '../components/ItineraryDay';
+import TravelAssistant from '../components/TravelAssistant';
+
+export const TripDetailsPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+
+  const [trip, setTrip] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Modals state
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  // Activity Add/Edit Modal
+  const [activityModalOpen, setActivityModalOpen] = useState(false);
+  const [activityModalMode, setActivityModalMode] = useState('add'); // 'add' or 'edit'
+  const [selectedDayNumber, setSelectedDayNumber] = useState(1);
+  const [selectedActivityId, setSelectedActivityId] = useState(null);
+  const [activityForm, setActivityForm] = useState({
+    time: '10:00 AM',
+    title: '',
+    description: '',
+    estimatedCost: 20,
+    category: 'Sightseeing',
+  });
+  const [savingActivity, setSavingActivity] = useState(false);
+
+  const fetchTrip = async () => {
+    try {
+      setLoading(true);
+      const res = await tripService.getTripById(id);
+      if (res.success && res.data) {
+        setTrip(res.data);
+      }
+    } catch (err) {
+      showToast('Could not load trip details.', 'error');
+      navigate('/dashboard');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTrip();
+  }, [id]);
+
+  const handleDeleteTrip = async () => {
+    setDeleting(true);
+    try {
+      const res = await tripService.deleteTrip(id);
+      if (res.success) {
+        showToast('Trip deleted successfully', 'success');
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      showToast('Failed to delete trip.', 'error');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  // Open Add Activity Modal
+  const handleOpenAddActivity = (dayNumber) => {
+    setSelectedDayNumber(dayNumber);
+    setActivityModalMode('add');
+    setActivityForm({
+      time: '10:00 AM',
+      title: '',
+      description: '',
+      estimatedCost: 25,
+      category: 'Sightseeing',
+    });
+    setActivityModalOpen(true);
+  };
+
+  // Open Edit Activity Modal
+  const handleOpenEditActivity = (activity, dayNumber) => {
+    setSelectedDayNumber(dayNumber);
+    setSelectedActivityId(activity._id);
+    setActivityModalMode('edit');
+    setActivityForm({
+      time: activity.time || '10:00 AM',
+      title: activity.title || '',
+      description: activity.description || '',
+      estimatedCost: activity.estimatedCost || 0,
+      category: activity.category || 'Sightseeing',
+    });
+    setActivityModalOpen(true);
+  };
+
+  // Delete Activity Handler
+  const handleDeleteActivity = async (activity, dayNumber) => {
+    try {
+      const res = await tripService.deleteActivity(id, dayNumber, activity._id);
+      if (res.success) {
+        showToast('Activity removed.', 'info');
+        setTrip(res.data);
+      }
+    } catch (err) {
+      showToast('Could not delete activity.', 'error');
+    }
+  };
+
+  // Save Add/Edit Activity
+  const handleSaveActivity = async (e) => {
+    e.preventDefault();
+    if (!activityForm.title.trim()) {
+      showToast('Activity title is required', 'warning');
+      return;
+    }
+
+    setSavingActivity(true);
+    try {
+      let res;
+      if (activityModalMode === 'add') {
+        res = await tripService.addActivity(id, selectedDayNumber, activityForm);
+      } else {
+        res = await tripService.updateActivity(
+          id,
+          selectedDayNumber,
+          selectedActivityId,
+          activityForm
+        );
+      }
+
+      if (res.success) {
+        showToast(
+          activityModalMode === 'add' ? 'Activity added! 🎯' : 'Activity updated! ✏️',
+          'success'
+        );
+        setTrip(res.data);
+        setActivityModalOpen(false);
+      }
+    } catch (err) {
+      showToast('Error saving activity.', 'error');
+    } finally {
+      setSavingActivity(false);
+    }
+  };
+
+  if (loading) {
+    return <LoadingSpinner fullPage message="Loading trip itinerary..." />;
+  }
+
+  if (!trip) {
+    return null;
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-8 lg:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Back Link */}
+        <div className="mb-6">
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          </Link>
+        </div>
+
+        {/* Hero Header Banner */}
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-soft mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-100">
+                  {trip.travelStyle} Style
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                  {trip.status}
+                </span>
+                {trip.interests && trip.interests.length > 0 && (
+                  <span className="text-xs text-slate-500">
+                    Interests: {trip.interests.join(', ')}
+                  </span>
+                )}
+              </div>
+
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                <MapPin className="w-7 h-7 text-sky-500 flex-shrink-0" />
+                {trip.destination}
+              </h1>
+
+              <p className="text-xs sm:text-sm text-slate-600 max-w-2xl font-medium leading-relaxed">
+                {trip.tripTitle || `${trip.travelStyle} Journey in ${trip.destination}`}
+              </p>
+            </div>
+
+            {/* Quick Action buttons */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <Link to={`/trips/${trip._id}/edit`}>
+                <Button variant="outline" size="sm" icon={Edit}>
+                  Edit Trip
+                </Button>
+              </Link>
+              <Button
+                variant="danger"
+                size="sm"
+                icon={Trash2}
+                onClick={() => setIsDeleteModalOpen(true)}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+
+          {/* Quick Stats Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-100 text-xs">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-sky-50 text-sky-600">
+                <Calendar className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-slate-400 block font-medium">Dates</span>
+                <span className="font-bold text-slate-800">{trip.startDate} - {trip.endDate}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600">
+                <Clock className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-slate-400 block font-medium">Duration</span>
+                <span className="font-bold text-slate-800">{trip.duration} {trip.duration === 1 ? 'Day' : 'Days'}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
+                <Users className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-slate-400 block font-medium">Travelers</span>
+                <span className="font-bold text-slate-800">{trip.travelers} {trip.travelers === 1 ? 'Person' : 'People'}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-600">
+                <DollarSign className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-slate-400 block font-medium">Total Budget</span>
+                <span className="font-bold text-slate-800">{trip.budget?.toLocaleString()} {trip.currency || 'USD'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Grid: Left (Itinerary Timeline), Right (Budget & Tips) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column: Itinerary Days */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-extrabold text-slate-900">Day-by-Day Schedule</h2>
+                <p className="text-xs text-slate-500">
+                  Customized activities curated for your {trip.travelStyle.toLowerCase()} trip
+                </p>
+              </div>
+              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-100">
+                {trip.days?.length || 0} Days
+              </span>
+            </div>
+
+            {trip.days && trip.days.length > 0 ? (
+              trip.days.map((dayData) => (
+                <ItineraryDay
+                  key={dayData.day}
+                  dayData={dayData}
+                  currency={trip.currency}
+                  onAddActivity={handleOpenAddActivity}
+                  onEditActivity={handleOpenEditActivity}
+                  onDeleteActivity={handleDeleteActivity}
+                />
+              ))
+            ) : (
+              <div className="p-8 text-center bg-white rounded-2xl border border-dashed border-slate-300 text-xs text-slate-500">
+                No itinerary days found. You can regenerate the itinerary from the Edit Trip page.
+              </div>
+            )}
+          </div>
+
+          {/* Right Column: Overview, Budget, Tips */}
+          <div className="space-y-6">
+            {/* Destination Summary Card */}
+            {trip.destinationSummary && (
+              <Card className="p-6">
+                <h3 className="text-sm font-bold text-slate-800 mb-2 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-sky-500" /> Destination Overview
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  {trip.destinationSummary}
+                </p>
+              </Card>
+            )}
+
+            {/* Budget Breakdown Component */}
+            <BudgetBreakdown
+              breakdown={trip.budgetBreakdown}
+              totalBudget={trip.budget}
+              currency={trip.currency}
+            />
+
+            {/* Packing Suggestions */}
+            {trip.packingSuggestions && trip.packingSuggestions.length > 0 && (
+              <Card className="p-6">
+                <h3 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2">
+                  <Luggage className="w-4 h-4 text-emerald-500" /> Packing Suggestions
+                </h3>
+                <ul className="space-y-2 text-xs text-slate-600">
+                  {trip.packingSuggestions.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
+
+            {/* Travel Tips */}
+            {trip.travelTips && trip.travelTips.length > 0 && (
+              <Card className="p-6">
+                <h3 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4 text-amber-500" /> Local Travel Tips
+                </h3>
+                <ul className="space-y-2 text-xs text-slate-600">
+                  {trip.travelTips.map((tipItem, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <Info className="w-3.5 h-3.5 text-amber-500 mt-0.5 flex-shrink-0" />
+                      <span>{tipItem}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Floating Travel Assistant Widget */}
+      <TravelAssistant
+        tripContext={{
+          destination: trip.destination,
+          startDate: trip.startDate,
+          endDate: trip.endDate,
+          duration: trip.duration,
+          travelers: trip.travelers,
+          budget: trip.budget,
+          currency: trip.currency,
+          travelStyle: trip.travelStyle,
+          interests: trip.interests,
+          destinationSummary: trip.destinationSummary,
+          days: trip.days,
+        }}
+      />
+
+      {/* Add/Edit Activity Modal */}
+      <Modal
+        isOpen={activityModalOpen}
+        onClose={() => setActivityModalOpen(false)}
+        title={
+          activityModalMode === 'add'
+            ? `Add Activity to Day ${selectedDayNumber}`
+            : `Edit Activity on Day ${selectedDayNumber}`
+        }
+      >
+        <form onSubmit={handleSaveActivity} className="space-y-4">
+          <Input
+            label="Activity Title"
+            placeholder="e.g. Visit Museum, Beach Sunset Walk, Lunch at Cafe"
+            value={activityForm.title}
+            onChange={(e) => setActivityForm({ ...activityForm, title: e.target.value })}
+            required
+          />
+
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="Time"
+              placeholder="e.g. 09:30 AM"
+              value={activityForm.time}
+              onChange={(e) => setActivityForm({ ...activityForm, time: e.target.value })}
+            />
+
+            <Input
+              label={`Estimated Cost (${trip.currency || 'USD'})`}
+              type="number"
+              min="0"
+              value={activityForm.estimatedCost}
+              onChange={(e) =>
+                setActivityForm({ ...activityForm, estimatedCost: e.target.value })
+              }
+            />
+          </div>
+
+          <Select
+            label="Category"
+            options={[
+              'Sightseeing',
+              'Food',
+              'Dining',
+              'Adventure',
+              'Culture',
+              'Leisure',
+              'Shopping',
+              'Photography',
+            ]}
+            value={activityForm.category}
+            onChange={(e) => setActivityForm({ ...activityForm, category: e.target.value })}
+          />
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+              Description / Notes
+            </label>
+            <textarea
+              rows="3"
+              value={activityForm.description}
+              onChange={(e) =>
+                setActivityForm({ ...activityForm, description: e.target.value })
+              }
+              placeholder="Additional details, directions, or ticket notes..."
+              className="w-full rounded-xl border border-slate-200 p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-200 focus:border-sky-500"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setActivityModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              isLoading={savingActivity}
+            >
+              {activityModalMode === 'add' ? 'Add Activity' : 'Save Changes'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Delete Trip"
+      >
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 p-3.5 rounded-xl bg-rose-50 text-rose-800 text-xs border border-rose-100">
+            <AlertTriangle className="w-5 h-5 text-rose-600 flex-shrink-0" />
+            <span>
+              Are you sure you want to delete your trip to{' '}
+              <strong>{trip.destination}</strong>? All itinerary items and notes will be permanently removed.
+            </span>
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsDeleteModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              isLoading={deleting}
+              icon={Trash2}
+              onClick={handleDeleteTrip}
+            >
+              Delete Trip
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    </div>
+  );
+};
+
+export default TripDetailsPage;
