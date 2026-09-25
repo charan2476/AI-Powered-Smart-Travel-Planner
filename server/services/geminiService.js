@@ -1,7 +1,97 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+const PRIMARY_MODEL = 'gemini-3.8-flash';
+const FALLBACK_MODEL = 'gemini-3.7-flash';
+const MAX_RETRIES = 3;
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 /**
- * Helper to generate fallback itinerary data when API key is missing or fails in development
+ * Helper to determine if an error is a transient/high-demand error eligible for retry
+ */
+const isTransientError = (error) => {
+  if (!error) return false;
+  const msg = (error.message || '').toLowerCase();
+  const status = error.status || error.statusCode || error.code;
+
+  // Do NOT retry client-side / auth errors
+  if (
+    status === 400 ||
+    status === 401 ||
+    status === 403 ||
+    msg.includes('api_key_invalid') ||
+    msg.includes('api key not valid') ||
+    msg.includes('invalid argument') ||
+    msg.includes('permission denied')
+  ) {
+    return false;
+  }
+
+  // Retry on 503, high demand, overloaded, network timeouts, or 429
+  return (
+    status === 503 ||
+    status === 429 ||
+    status === 500 ||
+    msg.includes('503') ||
+    msg.includes('service unavailable') ||
+    msg.includes('high demand') ||
+    msg.includes('overloaded') ||
+    msg.includes('spikes in demand') ||
+    msg.includes('resource exhausted') ||
+    msg.includes('rate limit') ||
+    msg.includes('econnreset') ||
+    msg.includes('etimedout')
+  );
+};
+
+/**
+ * Execute a Gemini generation request with retry and exponential backoff
+ */
+const executeWithRetryAndFallback = async (genAI, promptGenerator) => {
+  const modelsToTry = [PRIMARY_MODEL, FALLBACK_MODEL];
+
+  for (let modelIdx = 0; modelIdx < modelsToTry.length; modelIdx++) {
+    const modelName = modelsToTry[modelIdx];
+
+    if (modelIdx > 0) {
+      console.log(`⚠️ Gemini fallback model used: ${modelName}`);
+    }
+
+    const model = genAI.getGenerativeModel({ model: modelName });
+    const prompt = typeof promptGenerator === 'function' ? promptGenerator(modelName) : promptGenerator;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        console.log(`📡 Gemini request attempt ${attempt} with model ${modelName}`);
+        const result = await model.generateContent(prompt);
+        return result;
+      } catch (error) {
+        const isRetryable = isTransientError(error);
+
+        if (isRetryable && attempt < MAX_RETRIES) {
+          // Exponential backoff: ~1s, ~2s, ~4s
+          const delayMs = Math.pow(2, attempt - 1) * 1000;
+          console.warn(
+            `⚠️ Gemini returned 503 / temporary high demand, retrying in ${delayMs / 1000}s (attempt ${attempt}/${MAX_RETRIES})...`
+          );
+          await sleep(delayMs);
+        } else if (isRetryable && attempt === MAX_RETRIES && modelIdx < modelsToTry.length - 1) {
+          console.warn(`⚠️ Max retries reached for ${modelName}. Switching to fallback model...`);
+          break; // Switch to next model in modelsToTry
+        } else {
+          // Non-retryable error or final model attempt failed
+          console.error(`❌ Gemini API Error (${modelName}, attempt ${attempt}):`, error.message);
+          throw error;
+        }
+      }
+    }
+  }
+
+  throw new Error('All Gemini models and retries exhausted.');
+};
+
+/**
+ * Helper to generate fallback itinerary data when API key is missing or fails
  */
 const generateFallbackItinerary = (params) => {
   const {
@@ -29,37 +119,6 @@ const generateFallbackItinerary = (params) => {
   const transportBudget = Math.round(budget * 0.15);
   const activitiesBudget = Math.round(budget * 0.15);
   const miscBudget = Math.round(budget * 0.1);
-
-  const sampleActivitiesPool = [
-    {
-      time: '09:00 AM',
-      title: `Morning Exploration of ${destination} Landmark`,
-      description: `Start your journey exploring the iconic cultural sights and heritage quarters of ${destination}.`,
-      estimatedCost: Math.round(budget * 0.02),
-      category: 'Sightseeing',
-    },
-    {
-      time: '01:00 PM',
-      title: 'Authentic Local Culinary Tasting',
-      description: `Savor regional delicacies at a highly recommended local cafe and food market.`,
-      estimatedCost: Math.round(budget * 0.03),
-      category: 'Food',
-    },
-    {
-      time: '04:00 PM',
-      title: `${interests[0] || 'Scenic'} Leisure & Discovery Walk`,
-      description: `Immerse yourself in ${destination}'s vibrant neighborhoods, scenic vistas, and craft stalls.`,
-      estimatedCost: Math.round(budget * 0.01),
-      category: 'Leisure',
-    },
-    {
-      time: '07:30 PM',
-      title: 'Sunset Dinner & Relaxing Evening',
-      description: `Unwind with scenic views and delicious dining tailored to your ${travelStyle.toLowerCase()} travel style.`,
-      estimatedCost: Math.round(budget * 0.04),
-      category: 'Dining',
-    },
-  ];
 
   const days = [];
   for (let i = 1; i <= numDays; i++) {
@@ -135,7 +194,7 @@ const generateFallbackItinerary = (params) => {
 };
 
 /**
- * Generate Itinerary with Gemini API or Fallback
+ * Generate Itinerary with Gemini API (with retry & fallback model)
  */
 export const generateItinerary = async (params) => {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -149,8 +208,6 @@ export const generateItinerary = async (params) => {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    // Use gemini-3.8-flash
-    const model = genAI.getGenerativeModel({ model: 'gemini-3.8-flash' });
 
     const prompt = `
 You are an expert, world-class travel planner for the application TripGenie.
@@ -207,7 +264,7 @@ JSON Schema required:
 }
 `;
 
-    const result = await model.generateContent(prompt);
+    const result = await executeWithRetryAndFallback(genAI, prompt);
     const responseText = result.response.text();
 
     // Clean JSON response
@@ -221,14 +278,14 @@ JSON Schema required:
     const parsedData = JSON.parse(cleanedText);
     return parsedData;
   } catch (error) {
-    console.error('❌ Gemini API Error:', error.message);
+    console.error('❌ Gemini API Error after retries and fallbacks:', error.message);
     console.warn('⚠️ Falling back to development mock data due to AI API error.');
     return generateFallbackItinerary(params);
   }
 };
 
 /**
- * AI Travel Assistant Query
+ * AI Travel Assistant Query (with retry & fallback model)
  */
 export const askTravelAssistant = async ({ message, tripContext }) => {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -246,7 +303,6 @@ export const askTravelAssistant = async ({ message, tripContext }) => {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-3.8-flash' });
 
     const prompt = `
 You are TripGenie, a friendly, concise, and highly knowledgeable AI travel concierge assistant.
@@ -270,7 +326,7 @@ INSTRUCTIONS:
 - Keep the response concise, practical, and inspiring.
 `;
 
-    const result = await model.generateContent(prompt);
+    const result = await executeWithRetryAndFallback(genAI, prompt);
     const reply = result.response.text();
 
     return {
@@ -278,11 +334,11 @@ INSTRUCTIONS:
       isFallback: false,
     };
   } catch (error) {
-    console.error('❌ Gemini Travel Assistant Error:', error.message);
+    console.error('❌ Gemini Travel Assistant Error after retries and fallbacks:', error.message);
     return {
       reply: `I ran into a temporary connection issue while contacting the AI service, but here is a quick tip for ${
         tripContext?.destination || 'your trip'
-      }: Don't forget to keep offline maps and essentials packed!`,
+      }: Don't forget to check local weather forecasts, pack essentials according to the climate, and keep offline map directions handy!`,
       isFallback: true,
     };
   }
