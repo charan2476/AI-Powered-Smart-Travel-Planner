@@ -1,97 +1,151 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const PRIMARY_MODEL = 'gemini-3.8-flash';
-const FALLBACK_MODEL = 'gemini-3.7-flash';
-const MAX_RETRIES = 3;
+// Primary model configurable via GEMINI_MODEL env, with an ordered fallback chain of verified models
+const CONFIGURED_PRIMARY = process.env.GEMINI_MODEL ? process.env.GEMINI_MODEL.trim() : 'gemini-3.8-flash';
+const FALLBACK_MODELS = [
+  'gemini-3.5-flash-lite',
+  'gemini-3.6-flash',
+  'gemini-3.7-flash',
+  'gemini-3.5-flash',
+  'gemini-flash-lite-latest',
+  'gemini-flash-latest',
+];
 
+// Deduplicated list of models to attempt in order
+const getCandidateModels = () => {
+  const list = [CONFIGURED_PRIMARY, ...FALLBACK_MODELS];
+  return Array.from(new Set(list.filter(Boolean)));
+};
+
+const MAX_RETRIES = 3;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Helper to determine if an error is a transient/high-demand error eligible for retry
+ * Classify Gemini error status and type
  */
-const isTransientError = (error) => {
-  if (!error) return false;
-  const msg = (error.message || '').toLowerCase();
-  const status = error.status || error.statusCode || error.code;
+const classifyError = (error) => {
+  if (!error) return { status: 500, type: 'UNKNOWN', message: 'Unknown error' };
 
-  // Do NOT retry client-side / auth errors
+  const msg = (error.message || '').toLowerCase();
+  const status = Number(error.status || error.statusCode || error.code) || 0;
+
   if (
-    status === 400 ||
     status === 401 ||
     status === 403 ||
     msg.includes('api_key_invalid') ||
     msg.includes('api key not valid') ||
-    msg.includes('invalid argument') ||
-    msg.includes('permission denied')
+    msg.includes('permission denied') ||
+    msg.includes('unregistered project')
   ) {
-    return false;
+    return { status: 401, type: 'AUTH_ERROR', message: 'Authentication/API Key problem' };
   }
 
-  // Retry on 503, high demand, overloaded, network timeouts, or 429
-  return (
-    status === 503 ||
+  if (status === 404 || msg.includes('not found') || msg.includes('is not supported')) {
+    return { status: 404, type: 'MODEL_NOT_FOUND', message: 'Model or API endpoint not found' };
+  }
+
+  if (
     status === 429 ||
+    msg.includes('resource exhausted') ||
+    msg.includes('rate limit') ||
+    msg.includes('quota')
+  ) {
+    return { status: 429, type: 'RATE_LIMIT', message: 'Rate limit / quota exceeded' };
+  }
+
+  if (
+    status === 503 ||
     status === 500 ||
     msg.includes('503') ||
     msg.includes('service unavailable') ||
     msg.includes('high demand') ||
     msg.includes('overloaded') ||
     msg.includes('spikes in demand') ||
-    msg.includes('resource exhausted') ||
-    msg.includes('rate limit') ||
     msg.includes('econnreset') ||
     msg.includes('etimedout')
-  );
+  ) {
+    return { status: 503, type: 'TEMPORARY_SERVICE_ERROR', message: 'Temporary service high demand / 503' };
+  }
+
+  return { status: status || 500, type: 'GENERAL_ERROR', message: error.message || 'General AI error' };
 };
 
 /**
- * Execute a Gemini generation request with retry and exponential backoff
+ * Execute Gemini request across candidate models with retry, exponential backoff, and model fallback
  */
 const executeWithRetryAndFallback = async (genAI, promptGenerator) => {
-  const modelsToTry = [PRIMARY_MODEL, FALLBACK_MODEL];
+  const modelsToTry = getCandidateModels();
+  let lastError = null;
 
   for (let modelIdx = 0; modelIdx < modelsToTry.length; modelIdx++) {
     const modelName = modelsToTry[modelIdx];
 
     if (modelIdx > 0) {
-      console.log(`⚠️ Gemini fallback model used: ${modelName}`);
+      console.log(`[Gemini API] 🔄 Trying fallback model (${modelIdx + 1}/${modelsToTry.length}): ${modelName}`);
     }
 
-    const model = genAI.getGenerativeModel({ model: modelName });
+    let model;
+    try {
+      model = genAI.getGenerativeModel({ model: modelName });
+    } catch (initErr) {
+      console.warn(`[Gemini API] ⚠️ Failed initializing model ${modelName}:`, initErr.message);
+      continue;
+    }
+
     const prompt = typeof promptGenerator === 'function' ? promptGenerator(modelName) : promptGenerator;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
-        console.log(`📡 Gemini request attempt ${attempt} with model ${modelName}`);
+        console.log(`[Gemini API] 📡 Request started | Model: ${modelName} | Attempt: ${attempt}/${MAX_RETRIES}`);
         const result = await model.generateContent(prompt);
-        return result;
+        console.log(`[Gemini API] ✅ Success with model ${modelName} on attempt ${attempt}`);
+        return { result, modelName };
       } catch (error) {
-        const isRetryable = isTransientError(error);
+        lastError = error;
+        const errorInfo = classifyError(error);
 
-        if (isRetryable && attempt < MAX_RETRIES) {
-          // Exponential backoff: ~1s, ~2s, ~4s
-          const delayMs = Math.pow(2, attempt - 1) * 1000;
-          console.warn(
-            `⚠️ Gemini returned 503 / temporary high demand, retrying in ${delayMs / 1000}s (attempt ${attempt}/${MAX_RETRIES})...`
-          );
-          await sleep(delayMs);
-        } else if (isRetryable && attempt === MAX_RETRIES && modelIdx < modelsToTry.length - 1) {
-          console.warn(`⚠️ Max retries reached for ${modelName}. Switching to fallback model...`);
-          break; // Switch to next model in modelsToTry
+        // Safe error logging without exposing sensitive keys
+        console.warn(
+          `[Gemini API] ⚠️ Error on model: ${modelName} | Attempt: ${attempt} | HTTP Status: ${errorInfo.status} | Type: ${errorInfo.type} | Safe Message: ${errorInfo.message}`
+        );
+
+        // 401 / 403: Authentication/API key problem - abort immediately
+        if (errorInfo.type === 'AUTH_ERROR') {
+          console.error('[Gemini API] ❌ Authentication failed. Please check GEMINI_API_KEY environment variable.');
+          throw new Error('Gemini API authentication failed (401/403). Please verify GEMINI_API_KEY.');
+        }
+
+        // 404: Model not found or 429: Rate limit - switch to next model immediately without wasting retry delay
+        if (errorInfo.type === 'MODEL_NOT_FOUND' || errorInfo.type === 'RATE_LIMIT') {
+          console.warn(`[Gemini API] ⚠️ ${errorInfo.type} for ${modelName}. Switching immediately to next fallback model...`);
+          break; // Break inner retry loop to move to next model
+        }
+
+        // 503 / Temporary service errors: exponential backoff retry (1s, 2s, 4s)
+        if (errorInfo.type === 'TEMPORARY_SERVICE_ERROR') {
+          if (attempt < MAX_RETRIES) {
+            const delayMs = Math.pow(2, attempt - 1) * 1000;
+            console.log(`[Gemini API] ⏳ Backoff: retrying in ${delayMs / 1000}s (attempt ${attempt}/${MAX_RETRIES})...`);
+            await sleep(delayMs);
+          } else {
+            console.warn(`[Gemini API] ⚠️ Max retries (${MAX_RETRIES}) reached for ${modelName}. Moving to next fallback model...`);
+            break;
+          }
         } else {
-          // Non-retryable error or final model attempt failed
-          console.error(`❌ Gemini API Error (${modelName}, attempt ${attempt}):`, error.message);
-          throw error;
+          // Other unexpected error: switch model
+          break;
         }
       }
     }
   }
 
-  throw new Error('All Gemini models and retries exhausted.');
+  const finalError = classifyError(lastError);
+  console.error('[Gemini API] ❌ All Gemini candidate models exhausted. Final error:', finalError.message);
+  throw new Error(`All Gemini models failed. Last error: [${finalError.status}] ${finalError.message}`);
 };
 
 /**
- * Helper to generate fallback itinerary data when API key is missing or fails
+ * Helper to generate structured fallback itinerary data when AI API is unavailable
  */
 const generateFallbackItinerary = (params) => {
   const {
@@ -194,15 +248,13 @@ const generateFallbackItinerary = (params) => {
 };
 
 /**
- * Generate Itinerary with Gemini API (with retry & fallback model)
+ * Generate Itinerary with Gemini API (with robust retry & model fallback chain)
  */
 export const generateItinerary = async (params) => {
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey || apiKey === 'your_gemini_api_key' || apiKey.trim() === '') {
-    console.warn(
-      '⚠️ [DEV ONLY] GEMINI_API_KEY is not configured in server/.env. Using structured development fallback.'
-    );
+    console.warn('[Gemini API] ⚠️ GEMINI_API_KEY is not configured in server environment. Using structured fallback.');
     return generateFallbackItinerary(params);
   }
 
@@ -264,7 +316,7 @@ JSON Schema required:
 }
 `;
 
-    const result = await executeWithRetryAndFallback(genAI, prompt);
+    const { result, modelName } = await executeWithRetryAndFallback(genAI, prompt);
     const responseText = result.response.text();
 
     // Clean JSON response
@@ -276,16 +328,17 @@ JSON Schema required:
     }
 
     const parsedData = JSON.parse(cleanedText);
+    parsedData.modelUsed = modelName;
     return parsedData;
   } catch (error) {
-    console.error('❌ Gemini API Error after retries and fallbacks:', error.message);
-    console.warn('⚠️ Falling back to development mock data due to AI API error.');
+    console.error('[Gemini API] ❌ generateItinerary failed:', error.message);
+    console.warn('[Gemini API] ⚠️ Returning fallback structured itinerary.');
     return generateFallbackItinerary(params);
   }
 };
 
 /**
- * AI Travel Assistant Query (with retry & fallback model)
+ * AI Travel Assistant Query (with robust retry & model fallback chain)
  */
 export const askTravelAssistant = async ({ message, tripContext }) => {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -294,7 +347,7 @@ export const askTravelAssistant = async ({ message, tripContext }) => {
     return {
       reply: `[DEV FALLBACK] I am your TripGenie assistant! Based on your trip to ${
         tripContext?.destination || 'your destination'
-      } for ${tripContext?.travelers || 1} traveler(s) with a budget of ${
+      } for ${tripContext?.duration || 1} day(s) with ${tripContext?.travelers || 1} traveler(s) and a budget of ${
         tripContext?.budget || 'planned'
       } ${tripContext?.currency || 'USD'}, here is a helpful suggestion: Make sure to check weather forecasts, try local signature dishes, and keep transport passes handy. You asked: "${message}".`,
       isFallback: true,
@@ -306,40 +359,101 @@ export const askTravelAssistant = async ({ message, tripContext }) => {
 
     const prompt = `
 You are TripGenie, a friendly, concise, and highly knowledgeable AI travel concierge assistant.
-Answer the user's travel question clearly and practically in the context of their specific trip.
+Answer the user's travel question clearly, practically, and specifically in the context of their trip.
 
-TRIP CONTEXT:
+CURRENT TRIP CONTEXT:
 - Destination: ${tripContext?.destination || 'Unknown'}
-- Dates: ${tripContext?.startDate || ''} to ${tripContext?.endDate || ''} (${tripContext?.duration || 1} days)
+- Duration: ${tripContext?.duration || 1} days
+- Dates: ${tripContext?.startDate || 'Not set'} to ${tripContext?.endDate || 'Not set'}
 - Travelers: ${tripContext?.travelers || 1}
-- Budget: ${tripContext?.budget || 'Flexible'} ${tripContext?.currency || 'USD'}
+- Total Budget: ${tripContext?.budget || 'Flexible'} ${tripContext?.currency || 'USD'}
 - Travel Style: ${tripContext?.travelStyle || 'Standard'}
-- Interests: ${(tripContext?.interests || []).join(', ')}
+- Interests: ${Array.isArray(tripContext?.interests) ? tripContext.interests.join(', ') : 'Sightseeing, Local Culture'}
 - Destination Summary: ${tripContext?.destinationSummary || 'None provided'}
+${tripContext?.days?.length ? `- Planned Days: ${tripContext.days.length} days scheduled` : ''}
 
-USER QUERY:
+USER QUESTION:
 "${message}"
 
 INSTRUCTIONS:
-- Give a warm, helpful, and direct answer tailored to their destination, budget, and travel style.
-- Use bullet points or short paragraphs for clarity.
-- Keep the response concise, practical, and inspiring.
+1. Provide a warm, actionable, and direct response tailored specifically to the ${tripContext?.duration || 1}-day duration and ${tripContext?.destination || 'destination'}.
+2. Use bullet points or short clear paragraphs for readability.
+3. Keep the advice practical, accurate, and inspiring.
 `;
 
-    const result = await executeWithRetryAndFallback(genAI, prompt);
+    const { result, modelName } = await executeWithRetryAndFallback(genAI, prompt);
     const reply = result.response.text();
 
     return {
       reply,
       isFallback: false,
+      modelUsed: modelName,
     };
   } catch (error) {
-    console.error('❌ Gemini Travel Assistant Error after retries and fallbacks:', error.message);
+    console.error('[Gemini API] ❌ askTravelAssistant failed:', error.message);
+    const errorInfo = classifyError(error);
+
+    if (errorInfo.type === 'AUTH_ERROR') {
+      return {
+        reply: `⚠️ Authentication Issue: Unable to connect to Gemini API. Please verify the GEMINI_API_KEY environment variable.`,
+        isFallback: true,
+        error: errorInfo.message,
+      };
+    }
+
+    if (errorInfo.type === 'RATE_LIMIT') {
+      return {
+        reply: `⚠️ The AI service rate limit is currently reached. Here is a quick travel tip for ${
+          tripContext?.destination || 'your trip'
+        } (${tripContext?.duration || 1} days): Pack essentials for the local climate, carry offline maps, and check top cultural attractions in advance!`,
+        isFallback: true,
+        error: errorInfo.message,
+      };
+    }
+
     return {
-      reply: `I ran into a temporary connection issue while contacting the AI service, but here is a quick tip for ${
-        tripContext?.destination || 'your trip'
+      reply: `I ran into a temporary connection issue while contacting the AI service, but here is a quick tip for your ${
+        tripContext?.duration || 1
+      }-day trip to ${
+        tripContext?.destination || 'your destination'
       }: Don't forget to check local weather forecasts, pack essentials according to the climate, and keep offline map directions handy!`,
       isFallback: true,
+      error: errorInfo.message,
+    };
+  }
+};
+
+/**
+ * Internal test function for verifying Gemini connectivity, key, and model execution
+ */
+export const testGeminiAPI = async () => {
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!apiKey || apiKey === 'your_gemini_api_key' || apiKey.trim() === '') {
+    return {
+      success: false,
+      message: 'GEMINI_API_KEY is not configured in server environment',
+      models: getCandidateModels(),
+    };
+  }
+
+  try {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const testPrompt = 'Respond with "Gemini API is fully operational" in 5 words.';
+    const { result, modelName } = await executeWithRetryAndFallback(genAI, testPrompt);
+    const responseText = result.response.text();
+
+    return {
+      success: true,
+      modelUsed: modelName,
+      candidateModels: getCandidateModels(),
+      testResponse: responseText.trim(),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message,
+      candidateModels: getCandidateModels(),
     };
   }
 };

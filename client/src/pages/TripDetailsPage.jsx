@@ -303,17 +303,17 @@ export const TripDetailsPage = () => {
               </div>
               <div>
                 <span className="text-slate-400 block font-medium">Travelers</span>
-                <span className="font-bold text-slate-800">{trip.travelers} {trip.travelers === 1 ? 'Person' : 'People'}</span>
+                <span className="font-bold text-white">{trip.travelers} {trip.travelers === 1 ? 'Person' : 'People'}</span>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-600 border border-amber-100">
+              <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-400/30">
                 <DollarSign className="w-4 h-4" />
               </div>
               <div>
                 <span className="text-slate-400 block font-medium">Total Budget</span>
-                <span className="font-bold text-slate-800">{trip.budget?.toLocaleString()} {trip.currency || 'USD'}</span>
+                <span className="font-bold text-white">{trip.budget?.toLocaleString()} {trip.currency || 'USD'}</span>
               </div>
             </div>
           </div>

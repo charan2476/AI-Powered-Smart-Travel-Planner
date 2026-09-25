@@ -119,12 +119,41 @@ export const EditTripPage = () => {
     fetchTrip();
   }, [id]);
 
+  const calculateDuration = (start, end) => {
+    if (!start || !end) return 1;
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const diffTime = endDate.getTime() - startDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    return diffDays > 0 ? diffDays : 1;
+  };
+
+  const handleStartDateChange = (val) => {
+    const dur = calculateDuration(val, formData.endDate);
+    setFormData((prev) => ({
+      ...prev,
+      startDate: val,
+      duration: dur,
+    }));
+  };
+
+  const handleEndDateChange = (val) => {
+    const dur = calculateDuration(formData.startDate, val);
+    setFormData((prev) => ({
+      ...prev,
+      endDate: val,
+      duration: dur,
+    }));
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
+      const calculatedDuration = calculateDuration(formData.startDate, formData.endDate);
       const res = await tripService.updateTrip(id, {
         ...formData,
+        duration: calculatedDuration,
         travelers: Number(formData.travelers),
         budget: Number(formData.budget),
       });
@@ -249,7 +278,7 @@ export const EditTripPage = () => {
                 label="Start Date"
                 type="date"
                 value={formData.startDate}
-                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                onChange={(e) => handleStartDateChange(e.target.value)}
                 required
               />
 
@@ -257,7 +286,7 @@ export const EditTripPage = () => {
                 label="End Date"
                 type="date"
                 value={formData.endDate}
-                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                onChange={(e) => handleEndDateChange(e.target.value)}
                 required
               />
 
@@ -268,6 +297,15 @@ export const EditTripPage = () => {
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
               />
             </div>
+
+            {formData.startDate && formData.endDate && (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-500/10 border border-sky-400/20 text-sky-300 text-xs font-semibold">
+                <Calendar className="w-4 h-4 text-sky-400" />
+                <span>
+                  Trip Duration: <strong className="text-white font-bold">{formData.duration} {formData.duration === 1 ? 'Day' : 'Days'}</strong>
+                </span>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Input

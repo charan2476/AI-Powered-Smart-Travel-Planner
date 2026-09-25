@@ -34,6 +34,23 @@ export const TravelAssistant = ({ tripContext }) => {
     'Top safety and local etiquette tips?',
   ];
 
+  useEffect(() => {
+    setMessages((prev) => {
+      const hasUserMsg = prev.some((m) => m.sender === 'user');
+      if (!hasUserMsg) {
+        return [
+          {
+            id: 'welcome-1',
+            sender: 'ai',
+            text: `Hello! I'm your TripGenie AI Assistant for your ${tripContext?.duration || 1}-day trip to **${tripContext?.destination || 'your destination'}** (${tripContext?.travelers || 1} traveler${(tripContext?.travelers || 1) > 1 ? 's' : ''}). Ask me anything about packing, local cuisine, pacing your itinerary, or hidden gems!`,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          },
+        ];
+      }
+      return prev;
+    });
+  }, [tripContext?.destination, tripContext?.duration, tripContext?.travelers]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -62,7 +79,7 @@ export const TravelAssistant = ({ tripContext }) => {
     try {
       const res = await aiService.askTravelAssistant(query, tripContext);
       const aiReply = res.data?.reply || "I'm ready to help with any details of your trip!";
-      
+
       setMessages((prev) => [
         ...prev,
         {
@@ -73,12 +90,15 @@ export const TravelAssistant = ({ tripContext }) => {
         },
       ]);
     } catch (error) {
+      const errMsg =
+        error.response?.data?.message ||
+        "I couldn't reach the AI service at the moment. Please check your network or try again shortly.";
       setMessages((prev) => [
         ...prev,
         {
           id: (Date.now() + 1).toString(),
           sender: 'ai',
-          text: "I couldn't reach the AI service at the moment. Please check your network or try again shortly.",
+          text: errMsg,
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
@@ -89,7 +109,7 @@ export const TravelAssistant = ({ tripContext }) => {
 
   return (
     <>
-      {/* UIverse Inspired Floating Launcher Button */}
+      {/* Floating Launcher Button */}
       {!isOpen && (
         <button
           type="button"
@@ -130,8 +150,10 @@ export const TravelAssistant = ({ tripContext }) => {
                   TripGenie AI Concierge
                   <Sparkles className="w-3.5 h-3.5 text-sky-400" />
                 </h4>
-                <p className="text-[11px] text-sky-200/80 font-medium truncate max-w-[200px]">
-                  {tripContext?.destination ? `📍 Context: ${tripContext.destination}` : 'Ready to help'}
+                <p className="text-[11px] text-sky-200/80 font-medium truncate max-w-[240px]">
+                  {tripContext?.destination
+                    ? `📍 ${tripContext.destination} • ${tripContext.duration || 1} Days`
+                    : 'Ready to help'}
                 </p>
               </div>
             </div>

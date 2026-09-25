@@ -190,6 +190,7 @@ export const updateTrip = async (req, res, next) => {
       destination,
       startDate,
       endDate,
+      duration,
       travelers,
       budget,
       currency,
@@ -206,27 +207,81 @@ export const updateTrip = async (req, res, next) => {
       status,
     } = req.body;
 
-    if (startDate && endDate) {
-      trip.duration = calculateDuration(startDate, endDate);
+    const finalStartDate = startDate !== undefined ? startDate : trip.startDate;
+    const finalEndDate = endDate !== undefined ? endDate : trip.endDate;
+
+    // Calculate accurate duration from dates or explicit duration
+    let newDuration = calculateDuration(finalStartDate, finalEndDate);
+    if (duration !== undefined && Number(duration) > 0 && (!startDate || !endDate)) {
+      newDuration = Number(duration);
     }
+    trip.duration = newDuration;
 
     if (destination !== undefined) trip.destination = destination;
     if (startDate !== undefined) trip.startDate = startDate;
     if (endDate !== undefined) trip.endDate = endDate;
-    if (travelers !== undefined) trip.travelers = travelers;
-    if (budget !== undefined) trip.budget = budget;
+    if (travelers !== undefined) trip.travelers = Number(travelers);
+    if (budget !== undefined) trip.budget = Number(budget);
     if (currency !== undefined) trip.currency = currency;
     if (travelStyle !== undefined) trip.travelStyle = travelStyle;
     if (interests !== undefined) trip.interests = interests;
     if (tripTitle !== undefined) trip.tripTitle = tripTitle;
     if (destinationSummary !== undefined) trip.destinationSummary = destinationSummary;
-    if (estimatedTotalCost !== undefined) trip.estimatedTotalCost = estimatedTotalCost;
+    if (estimatedTotalCost !== undefined) trip.estimatedTotalCost = Number(estimatedTotalCost);
     if (budgetBreakdown !== undefined) trip.budgetBreakdown = budgetBreakdown;
-    if (days !== undefined) trip.days = days;
+
+    // Synchronize days array with duration
+    if (days !== undefined && Array.isArray(days)) {
+      trip.days = days;
+    } else if (Array.isArray(trip.days) && trip.days.length > 0) {
+      // If duration changed and days was not explicitly passed, sync days array with new duration & dates
+      const start = new Date(finalStartDate);
+      if (trip.days.length > newDuration) {
+        // Slice days down to new duration (e.g. 6 days -> 3 days)
+        trip.days = trip.days.slice(0, newDuration);
+      } else if (trip.days.length < newDuration) {
+        // Expand days up to new duration
+        const existingCount = trip.days.length;
+        for (let i = existingCount + 1; i <= newDuration; i++) {
+          trip.days.push({
+            day: i,
+            date: '',
+            theme: `Exploring Highlights of ${trip.destination}`,
+            activities: [
+              {
+                time: '10:00 AM',
+                title: `Day ${i} Discovery in ${trip.destination}`,
+                description: `Explore local attractions and landmarks.`,
+                estimatedCost: Math.round((trip.budget * 0.03) / newDuration),
+                category: 'Sightseeing',
+              },
+            ],
+          });
+        }
+      }
+
+      // Re-align day numbers (1..newDuration) and date strings based on startDate
+      trip.days.forEach((d, idx) => {
+        d.day = idx + 1;
+        const dayDate = new Date(start);
+        dayDate.setDate(dayDate.getDate() + idx);
+        d.date = dayDate.toISOString().split('T')[0];
+      });
+    }
+
     if (travelTips !== undefined) trip.travelTips = travelTips;
     if (packingSuggestions !== undefined) trip.packingSuggestions = packingSuggestions;
     if (importantNotes !== undefined) trip.importantNotes = importantNotes;
-    if (status !== undefined) trip.status = status;
+
+    // Status check
+    const today = new Date().toISOString().split('T')[0];
+    if (status !== undefined) {
+      trip.status = status;
+    } else if (trip.endDate < today) {
+      trip.status = 'Completed';
+    } else if (trip.status === 'Completed' && trip.endDate >= today) {
+      trip.status = 'Upcoming';
+    }
 
     const updatedTrip = await trip.save();
 

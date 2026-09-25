@@ -1,9 +1,9 @@
-import { generateItinerary, askTravelAssistant } from '../services/geminiService.js';
+import { generateItinerary, askTravelAssistant, testGeminiAPI } from '../services/geminiService.js';
 
 /**
  * @desc    Generate a structured AI itinerary
  * @route   POST /api/ai/generate-itinerary
- * @access  Private (or Public if testing before login, protected for authenticated flow)
+ * @access  Private
  */
 export const generateAIItinerary = async (req, res, next) => {
   try {
@@ -72,6 +72,20 @@ export const chatTravelAssistant = async (req, res, next) => {
       success: true,
       data: response,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Test Gemini API connectivity and current model
+ * @route   GET /api/ai/test
+ * @access  Private
+ */
+export const testGeminiStatus = async (req, res, next) => {
+  try {
+    const result = await testGeminiAPI();
+    res.json(result);
   } catch (error) {
     next(error);
   }
