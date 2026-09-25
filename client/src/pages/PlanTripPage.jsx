@@ -198,16 +198,16 @@ export const PlanTripPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 py-10 lg:py-14 relative overflow-hidden text-slate-900">
-      {/* High-Quality Travel Background Image */}
+    <div className="min-h-screen bg-slate-950 py-10 lg:py-14 relative overflow-hidden text-slate-900">
+      {/* High-Quality Travel Background Image: Yosemite Mountain Valley Horizon */}
       <div className="absolute inset-0 z-0">
         <img
-          src="https://images.unsplash.com/photo-1503220317375-aaad61436b1b?auto=format&fit=crop&w=2000&q=80"
-          alt="Scenic Travel Mountain Vista"
-          className="w-full h-full object-cover object-center opacity-25 brightness-90 transform scale-105"
+          src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=2000&q=80"
+          alt="Scenic Mountain Valley and Lake Travel Horizon"
+          className="w-full h-full object-cover object-center opacity-30 brightness-90 transform scale-105"
         />
         {/* Dark Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/95 via-slate-900/90 to-slate-950/95" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/92 via-slate-900/85 to-slate-950/95" />
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

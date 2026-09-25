@@ -110,25 +110,21 @@ export const DashboardPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8 lg:py-12 relative overflow-hidden">
-      {/* Subtle World Map / Travel Coordinate Pattern Watermark */}
-      <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none bg-repeat bg-center"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M60 10 L65 25 L80 25 L68 35 L72 50 L60 40 L48 50 L52 35 L40 25 L55 25 Z M10 80 A5 5 0 1 1 10 70 A5 5 0 1 1 10 80 Z M110 90 A4 4 0 1 1 110 82 A4 4 0 1 1 110 90 Z' fill='%230284c7'/%3E%3C/svg%3E")`,
-          backgroundSize: '160px 160px',
-        }}
-      />
+    <div className="min-h-screen bg-slate-950 py-8 lg:py-12 relative overflow-hidden text-white">
+      {/* Background Image: World Map & Flight Connectivity from Orbit (Command Center Theme) */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=80"
+          alt="World flight connectivity from orbit"
+          className="w-full h-full object-cover object-center opacity-35 brightness-90 transform scale-105"
+        />
+        {/* Dark Blue/Black Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/92 via-slate-900/85 to-slate-950/95" />
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Command Center Hero Banner with Travel Background & Dark Overlay */}
-        <div className="rounded-3xl p-6 sm:p-10 text-white shadow-card relative overflow-hidden mb-8 border border-slate-800 bg-slate-950">
-          <img
-            src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80"
-            alt="World Travel Map Overlay"
-            className="absolute inset-0 w-full h-full object-cover object-center opacity-20 brightness-90"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-navy-950/90" />
+        <div className="glass-panel rounded-3xl p-6 sm:p-10 text-white shadow-2xl relative overflow-hidden mb-8 border border-white/20">
           <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/15 rounded-full blur-3xl pointer-events-none" />
           
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
@@ -206,16 +202,16 @@ export const DashboardPage = () => {
 
         {/* AI Travel Insight Card */}
         {highlightedTrip && (
-          <div className="mb-8 p-5 bg-gradient-to-r from-sky-50 via-blue-50 to-indigo-50 rounded-2xl border border-sky-100 flex items-start gap-3.5 shadow-xs">
+          <div className="mb-8 p-5 bg-sky-950/70 backdrop-blur-md rounded-2xl border border-sky-400/30 flex items-start gap-3.5 shadow-xl text-white">
             <div className="w-9 h-9 rounded-xl bg-sky-500 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
               <Lightbulb className="w-5 h-5" />
             </div>
             <div className="flex-1">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-sky-900 mb-0.5 flex items-center gap-1.5">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-sky-300 mb-0.5 flex items-center gap-1.5">
                 AI Travel Insight for {highlightedTrip.destination}
-                <Sparkles className="w-3 h-3 text-sky-600" />
+                <Sparkles className="w-3 h-3 text-sky-400" />
               </h3>
-              <p className="text-xs text-slate-700 leading-relaxed font-medium">
+              <p className="text-xs text-slate-200 leading-relaxed font-medium">
                 {highlightedTrip.travelTips && highlightedTrip.travelTips.length > 0
                   ? highlightedTrip.travelTips[0]
                   : `Based on your upcoming ${highlightedTrip.travelStyle.toLowerCase()} trip to ${highlightedTrip.destination}, consider visiting major sights in the morning to enjoy pleasant weather and beat the afternoon crowds!`}
@@ -232,14 +228,14 @@ export const DashboardPage = () => {
             {highlightedTrip && (
               <div>
                 <div className="flex items-center gap-2 mb-3.5">
-                  <Plane className="w-4 h-4 text-sky-600" />
-                  <h2 className="text-lg font-black text-slate-900">Upcoming Journey</h2>
+                  <Plane className="w-4 h-4 text-sky-400" />
+                  <h2 className="text-lg font-black text-white">Upcoming Journey</h2>
                 </div>
 
-                <div className="bg-gradient-to-r from-slate-900 via-sky-950 to-blue-950 rounded-3xl p-6 sm:p-8 text-white shadow-card relative overflow-hidden border border-slate-800">
+                <div className="glass-panel rounded-3xl p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden border border-white/20">
                   <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                     <div className="space-y-2">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-sky-300 text-xs font-bold border border-white/20 backdrop-blur-xs">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 text-xs font-bold border border-sky-400/30 backdrop-blur-xs">
                         {highlightedTrip.travelStyle} Escape
                       </span>
                       <h3 className="text-2xl sm:text-3xl font-black flex items-center gap-2 text-white">
@@ -279,12 +275,12 @@ export const DashboardPage = () => {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-xl font-black text-slate-900">Your Saved Trips</h2>
-                  <p className="text-xs text-slate-500">
+                  <h2 className="text-xl font-black text-white">Your Saved Trips</h2>
+                  <p className="text-xs text-slate-400">
                     Manage, customize, and review your day-by-day itineraries
                   </p>
                 </div>
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-100">
+                <span className="text-xs font-bold px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30">
                   {trips.length} {trips.length === 1 ? 'Trip' : 'Trips'}
                 </span>
               </div>
@@ -311,16 +307,16 @@ export const DashboardPage = () => {
 
             {/* Popular Destinations Showcase */}
             {popularDestinations.length > 0 && (
-              <div className="pt-6 border-t border-slate-200/80">
+              <div className="pt-6 border-t border-white/10">
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h2 className="text-xl font-black text-slate-900">Trending Destinations</h2>
-                    <p className="text-xs text-slate-500">
+                    <h2 className="text-xl font-black text-white">Trending Destinations</h2>
+                    <p className="text-xs text-slate-400">
                       Looking for inspiration? Browse popular travel spots
                     </p>
                   </div>
                   <Link to="/explore">
-                    <Button variant="outline" size="sm" icon={ArrowRight}>
+                    <Button variant="outline" size="sm" icon={ArrowRight} className="bg-white/10 text-white border-white/20 hover:bg-white/20 hover:text-white">
                       View All Destinations
                     </Button>
                   </Link>

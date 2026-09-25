@@ -173,6 +173,19 @@ export const TripDetailsPage = () => {
     }
   };
 
+  const getDestinationImage = (destinationName) => {
+    const name = (destinationName || '').toLowerCase();
+    if (name.includes('goa')) return 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=2000&q=80';
+    if (name.includes('paris')) return 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=2000&q=80';
+    if (name.includes('tokyo') || name.includes('japan')) return 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=2000&q=80';
+    if (name.includes('dubai')) return 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=2000&q=80';
+    if (name.includes('bali')) return 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=2000&q=80';
+    if (name.includes('manali') || name.includes('himalaya') || name.includes('mountain') || name.includes('switzerland')) return 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=2000&q=80';
+    if (name.includes('jaipur') || name.includes('rajasthan')) return 'https://images.unsplash.com/photo-1603262110263-fb010d6e59d4?auto=format&fit=crop&w=2000&q=80';
+    if (name.includes('kerala')) return 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=2000&q=80';
+    return 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=2000&q=80';
+  };
+
   if (loading) {
     return <LoadingSpinner fullPage message="Loading trip itinerary..." />;
   }
@@ -181,26 +194,39 @@ export const TripDetailsPage = () => {
     return null;
   }
 
+  const destBg = getDestinationImage(trip.destination);
+
   return (
-    <div className="min-h-screen bg-slate-50 py-8 lg:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-950 py-8 lg:py-12 relative overflow-hidden text-white">
+      {/* Full-Page Dynamic Destination Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src={destBg}
+          alt={trip.destination}
+          className="w-full h-full object-cover object-center opacity-25 brightness-90 transform scale-105"
+        />
+        {/* Dark Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/92 via-slate-900/85 to-slate-950/95" />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Back Link */}
         <div className="mb-5">
           <Link
             to="/dashboard"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </Link>
         </div>
 
         {/* Hero Header Banner with Destination Travel Background & Dark Gradient Overlay */}
-        <div className="rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-card mb-8 relative overflow-hidden bg-slate-950 text-white">
+        <div className="glass-panel rounded-3xl p-6 sm:p-8 border border-white/20 shadow-2xl mb-8 relative overflow-hidden text-white">
           {/* Destination Hero Background Image */}
           <img
-            src={`https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80`}
+            src={destBg}
             alt={trip.destination}
-            className="absolute inset-0 w-full h-full object-cover object-center opacity-30 brightness-90 transform scale-105"
+            className="absolute inset-0 w-full h-full object-cover object-center opacity-35 brightness-90 transform scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-900/70" />
           <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />

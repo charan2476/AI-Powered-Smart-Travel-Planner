@@ -30,7 +30,7 @@ export const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md border-b border-slate-200/80 transition-all">
+    <nav className="sticky top-0 z-40 w-full bg-slate-950/80 backdrop-blur-xl border-b border-white/10 transition-all text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Brand Logo */}
@@ -39,10 +39,10 @@ export const Navbar = () => {
               <Compass className="w-6 h-6 animate-pulse" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-sky-800 to-blue-600 bg-clip-text text-transparent">
+              <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-sky-200 to-blue-400 bg-clip-text text-transparent">
                 TripGenie
               </span>
-              <span className="text-[10px] font-semibold text-sky-600 tracking-wider uppercase -mt-1 flex items-center gap-1">
+              <span className="text-[10px] font-semibold text-sky-400 tracking-wider uppercase -mt-1 flex items-center gap-1">
                 AI Travel Planner <Sparkles className="w-2.5 h-2.5" />
               </span>
             </div>
@@ -54,11 +54,11 @@ export const Navbar = () => {
               to="/explore"
               className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-1.5 ${
                 isActive('/explore')
-                  ? 'bg-sky-50 text-sky-700 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'bg-sky-500/20 text-sky-300 font-semibold border border-sky-400/30'
+                  : 'text-slate-300 hover:text-white hover:bg-white/10'
               }`}
             >
-              <Globe className="w-4 h-4 text-sky-500" />
+              <Globe className="w-4 h-4 text-sky-400" />
               Explore Destinations
             </Link>
 
@@ -68,22 +68,22 @@ export const Navbar = () => {
                   to="/dashboard"
                   className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-1.5 ${
                     isActive('/dashboard')
-                      ? 'bg-sky-50 text-sky-700 font-semibold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                      ? 'bg-sky-500/20 text-sky-300 font-semibold border border-sky-400/30'
+                      : 'text-slate-300 hover:text-white hover:bg-white/10'
                   }`}
                 >
-                  <LayoutDashboard className="w-4 h-4 text-sky-500" />
+                  <LayoutDashboard className="w-4 h-4 text-sky-400" />
                   Dashboard
                 </Link>
                 <Link
                   to="/plan"
                   className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-1.5 ${
                     isActive('/plan')
-                      ? 'bg-sky-50 text-sky-700 font-semibold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                      ? 'bg-sky-500/20 text-sky-300 font-semibold border border-sky-400/30'
+                      : 'text-slate-300 hover:text-white hover:bg-white/10'
                   }`}
                 >
-                  <PlusCircle className="w-4 h-4 text-sky-500" />
+                  <PlusCircle className="w-4 h-4 text-sky-400" />
                   Plan Trip
                 </Link>
               </>
@@ -96,12 +96,12 @@ export const Navbar = () => {
               <div className="relative">
                 <button
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center gap-2.5 p-1.5 pl-3 rounded-full bg-slate-100 hover:bg-slate-200/80 transition-colors border border-slate-200"
+                  className="flex items-center gap-2.5 p-1.5 pl-3 rounded-full bg-slate-900/90 hover:bg-slate-800 transition-colors border border-white/20 cursor-pointer"
                 >
-                  <span className="text-xs font-semibold text-slate-700 max-w-[120px] truncate">
+                  <span className="text-xs font-semibold text-slate-200 max-w-[120px] truncate">
                     {user?.name || 'My Account'}
                   </span>
-                  <div className="w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
                     {user?.name ? user.name.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
                   </div>
                 </button>
@@ -109,35 +109,35 @@ export const Navbar = () => {
                 {/* User Dropdown */}
                 {userDropdownOpen && (
                   <div
-                    className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-card border border-slate-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-150"
+                    className="absolute right-0 mt-2 w-56 glass-panel bg-slate-900/95 rounded-2xl shadow-2xl border border-white/20 py-2 z-50 animate-in fade-in zoom-in-95 duration-150"
                     onMouseLeave={() => setUserDropdownOpen(false)}
                   >
-                    <div className="px-4 py-2 border-b border-slate-100">
+                    <div className="px-4 py-2 border-b border-white/10">
                       <p className="text-xs text-slate-400 font-medium">Signed in as</p>
-                      <p className="text-sm font-bold text-slate-800 truncate">{user?.email}</p>
+                      <p className="text-sm font-bold text-white truncate">{user?.email}</p>
                     </div>
                     <Link
                       to="/dashboard"
                       onClick={() => setUserDropdownOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                      className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-200 hover:bg-white/10 transition-colors"
                     >
-                      <LayoutDashboard className="w-4 h-4 text-slate-400" />
+                      <LayoutDashboard className="w-4 h-4 text-sky-400" />
                       Dashboard
                     </Link>
                     <Link
                       to="/plan"
                       onClick={() => setUserDropdownOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                      className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-200 hover:bg-white/10 transition-colors"
                     >
-                      <PlusCircle className="w-4 h-4 text-slate-400" />
+                      <PlusCircle className="w-4 h-4 text-sky-400" />
                       Plan New Trip
                     </Link>
-                    <div className="border-t border-slate-100 my-1" />
+                    <div className="border-t border-white/10 my-1" />
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 transition-colors text-left"
+                      className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-rose-400 hover:bg-rose-500/10 transition-colors text-left cursor-pointer"
                     >
-                      <LogOut className="w-4 h-4 text-rose-500" />
+                      <LogOut className="w-4 h-4 text-rose-400" />
                       Logout
                     </button>
                   </div>
@@ -146,12 +146,12 @@ export const Navbar = () => {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
                     Log In
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <Button variant="primary" size="sm" icon={Sparkles}>
+                  <Button variant="primary" size="sm" icon={Sparkles} className="shadow-glow font-bold">
                     Get Started
                   </Button>
                 </Link>

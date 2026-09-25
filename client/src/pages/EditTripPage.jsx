@@ -185,12 +185,23 @@ export const EditTripPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8 lg:py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-950 py-8 lg:py-12 relative overflow-hidden text-white">
+      {/* Background Image: Tropical Travel Horizon */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80"
+          alt="Tropical Travel Horizon"
+          className="w-full h-full object-cover object-center opacity-30 brightness-90 transform scale-105"
+        />
+        {/* Dark Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/92 via-slate-900/85 to-slate-950/95" />
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="mb-6 flex items-center justify-between">
           <Link
             to={`/trips/${id}`}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Cancel & Return to Itinerary
           </Link>
@@ -201,16 +212,16 @@ export const EditTripPage = () => {
             onClick={() => setConfirmRegenModal(true)}
             isLoading={regenerating}
             icon={RefreshCw}
-            className="text-xs text-sky-700 hover:text-sky-800 hover:bg-sky-50 border-sky-200"
+            className="text-xs text-white bg-white/10 hover:bg-white/20 border-white/20 backdrop-blur-md"
           >
             Regenerate Itinerary with AI
           </Button>
         </div>
 
-        <Card className="p-6 sm:p-8 shadow-card border-slate-200/80">
-          <div className="mb-6 border-b border-slate-100 pb-4">
-            <h1 className="text-2xl font-extrabold text-slate-900">Edit Trip Details</h1>
-            <p className="text-xs text-slate-500 mt-0.5">
+        <div className="glass-panel p-6 sm:p-8 rounded-3xl shadow-2xl border border-white/20">
+          <div className="mb-6 border-b border-white/10 pb-4">
+            <h1 className="text-2xl font-extrabold text-white">Edit Trip Details</h1>
+            <p className="text-xs text-slate-300 mt-0.5">
               Update travel preferences, dates, or trip status
             </p>
           </div>
@@ -332,7 +343,7 @@ export const EditTripPage = () => {
               </Button>
             </div>
           </form>
-        </Card>
+        </div>
       </div>
 
       {/* Confirmation Modal for AI Regeneration */}

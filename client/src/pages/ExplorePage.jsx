@@ -49,25 +49,21 @@ export const ExplorePage = () => {
   }, [searchQuery, selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8 lg:py-14 relative overflow-hidden">
-      {/* Subtle Travel Destination Watermark */}
-      <div
-        className="absolute inset-0 opacity-[0.025] pointer-events-none bg-repeat bg-center"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M60 10 L65 25 L80 25 L68 35 L72 50 L60 40 L48 50 L52 35 L40 25 L55 25 Z M10 80 A5 5 0 1 1 10 70 A5 5 0 1 1 10 80 Z M110 90 A4 4 0 1 1 110 82 A4 4 0 1 1 110 90 Z' fill='%230284c7'/%3E%3C/svg%3E")`,
-          backgroundSize: '160px 160px',
-        }}
-      />
+    <div className="min-h-screen bg-slate-950 py-8 lg:py-14 relative overflow-hidden text-white">
+      {/* Background Image: World Travel Explorer / Destinations */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=2000&q=80"
+          alt="World destination explorer"
+          className="w-full h-full object-cover object-center opacity-30 brightness-90 transform scale-105"
+        />
+        {/* Dark Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/92 via-slate-900/85 to-slate-950/95" />
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header Hero Banner with Destination Background */}
-        <div className="relative overflow-hidden rounded-3xl bg-slate-950 text-white p-8 sm:p-12 mb-10 shadow-card border border-slate-800">
-          <img
-            src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80"
-            alt="World Destination Explore"
-            className="absolute inset-0 w-full h-full object-cover object-center opacity-25 brightness-90"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-navy-950/85" />
+        <div className="glass-panel relative overflow-hidden rounded-3xl p-8 sm:p-12 mb-10 shadow-2xl border border-white/20">
           <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/15 rounded-full blur-3xl pointer-events-none" />
           
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
@@ -76,7 +72,7 @@ export const ExplorePage = () => {
                 <Globe className="w-3.5 h-3.5 text-sky-400" />
                 Curated Travel Catalog
               </div>
-              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
+              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
                 Explore Your Next Adventure 🌍
               </h1>
               <p className="text-sm sm:text-base text-slate-300 max-w-xl leading-relaxed">
@@ -92,8 +88,8 @@ export const ExplorePage = () => {
           </div>
         </div>
 
-        {/* Search & Category Filter Controls */}
-        <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200/80 shadow-soft mb-10 flex flex-col md:flex-row items-center gap-4 justify-between">
+        {/* Search & Category Filter Controls in Glass Panel */}
+        <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-white/20 shadow-xl mb-10 flex flex-col md:flex-row items-center gap-4 justify-between">
           {/* Search Input */}
           <div className="w-full md:w-96">
             <Input
@@ -101,7 +97,7 @@ export const ExplorePage = () => {
               icon={Search}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-slate-50 text-xs"
+              className="bg-slate-900/80 text-white border-white/20 text-xs"
             />
           </div>
 
@@ -117,7 +113,7 @@ export const ExplorePage = () => {
                   className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                     active
                       ? 'bg-sky-500 text-white shadow-md shadow-sky-500/30 ring-2 ring-sky-300/40'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                      : 'bg-slate-900/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-white/10'
                   }`}
                 >
                   {cat}
