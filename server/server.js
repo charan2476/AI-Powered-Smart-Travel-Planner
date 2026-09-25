@@ -30,15 +30,50 @@ connectDB().then(async () => {
 
 const app = express();
 
+// Allowed Origins for CORS
+const allowedOrigins = [
+  'https://ai-powered-smart-travel-planner.vercel.app',
+  'https://ai-powered-smart-travel-planner-kz0i.onrender.com',
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5173',
+  process.env.CLIENT_URL,
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
+// CORS configuration
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+
+      const normalizedOrigin = origin.replace(/\/$/, '');
+      const isAllowed =
+        allowedOrigins.some((allowed) => allowed.replace(/\/$/, '') === normalizedOrigin) ||
+        normalizedOrigin.endsWith('.vercel.app') ||
+        process.env.NODE_ENV !== 'production';
+
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        console.warn(`⚠️ Blocked by CORS: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  })
+);
+
+// Explicit pre-flight response for all routes
+app.options('*', cors());
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(
-  cors({
-    origin: '*', // Allow all origins for seamless local development
-    credentials: true,
-  })
-);
 
 if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
