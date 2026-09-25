@@ -110,15 +110,30 @@ export const DashboardPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8 lg:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Command Center Hero Banner */}
-        <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-navy-900 rounded-3xl p-6 sm:p-10 text-white shadow-card relative overflow-hidden mb-8 border border-slate-800">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-slate-50 py-8 lg:py-12 relative overflow-hidden">
+      {/* Subtle World Map / Travel Coordinate Pattern Watermark */}
+      <div
+        className="absolute inset-0 opacity-[0.03] pointer-events-none bg-repeat bg-center"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M60 10 L65 25 L80 25 L68 35 L72 50 L60 40 L48 50 L52 35 L40 25 L55 25 Z M10 80 A5 5 0 1 1 10 70 A5 5 0 1 1 10 80 Z M110 90 A4 4 0 1 1 110 82 A4 4 0 1 1 110 90 Z' fill='%230284c7'/%3E%3C/svg%3E")`,
+          backgroundSize: '160px 160px',
+        }}
+      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Command Center Hero Banner with Travel Background & Dark Overlay */}
+        <div className="rounded-3xl p-6 sm:p-10 text-white shadow-card relative overflow-hidden mb-8 border border-slate-800 bg-slate-950">
+          <img
+            src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80"
+            alt="World Travel Map Overlay"
+            className="absolute inset-0 w-full h-full object-cover object-center opacity-20 brightness-90"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-navy-950/90" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/15 rounded-full blur-3xl pointer-events-none" />
           
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="space-y-3.5 max-w-xl">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/20 text-sky-300 text-xs font-bold border border-sky-400/30">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/20 text-sky-300 text-xs font-bold border border-sky-400/30 backdrop-blur-md">
                 <Sparkles className="w-3.5 h-3.5" /> Travel Command Center
               </div>
               
@@ -142,7 +157,7 @@ export const DashboardPage = () => {
                     size="md"
                     variant="outline"
                     icon={Globe}
-                    className="bg-white/10 text-white border-white/20 hover:bg-white/20 hover:text-white"
+                    className="bg-white/10 text-white border-white/20 hover:bg-white/20 hover:text-white backdrop-blur-md"
                   >
                     Explore Destinations
                   </Button>

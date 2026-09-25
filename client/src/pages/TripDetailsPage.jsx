@@ -194,30 +194,39 @@ export const TripDetailsPage = () => {
           </Link>
         </div>
 
-        {/* Hero Header Banner */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-card mb-8 relative overflow-hidden">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        {/* Hero Header Banner with Destination Travel Background & Dark Gradient Overlay */}
+        <div className="rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-card mb-8 relative overflow-hidden bg-slate-950 text-white">
+          {/* Destination Hero Background Image */}
+          <img
+            src={`https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80`}
+            alt={trip.destination}
+            className="absolute inset-0 w-full h-full object-cover object-center opacity-30 brightness-90 transform scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-900/70" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2 mb-2">
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-100">
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-400/30 backdrop-blur-md">
                   {trip.travelStyle} Style
                 </span>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 backdrop-blur-md">
                   {trip.status}
                 </span>
                 {trip.interests && trip.interests.length > 0 && (
-                  <span className="text-xs text-slate-500 font-medium">
+                  <span className="text-xs text-slate-300 font-medium">
                     Interests: {trip.interests.join(', ')}
                   </span>
                 )}
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                <MapPin className="w-7 h-7 text-sky-500 flex-shrink-0" />
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight flex items-center gap-2 drop-shadow-md">
+                <MapPin className="w-7 h-7 text-sky-400 flex-shrink-0" />
                 {trip.destination}
               </h1>
 
-              <p className="text-xs sm:text-sm text-slate-600 max-w-2xl font-medium leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-200 max-w-2xl font-medium leading-relaxed">
                 {trip.tripTitle || `${trip.travelStyle} Journey in ${trip.destination}`}
               </p>
             </div>
@@ -225,7 +234,7 @@ export const TripDetailsPage = () => {
             {/* Quick Action buttons */}
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
               <Link to={`/trips/${trip._id}/edit`}>
-                <Button variant="outline" size="sm" icon={Edit}>
+                <Button variant="outline" size="sm" icon={Edit} className="bg-white/10 text-white border-white/20 hover:bg-white/20 hover:text-white backdrop-blur-md">
                   Edit Trip
                 </Button>
               </Link>
@@ -241,29 +250,29 @@ export const TripDetailsPage = () => {
           </div>
 
           {/* Quick Stats Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-100 text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-800 text-xs relative z-10">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-sky-50 text-sky-600 border border-sky-100">
+              <div className="p-2.5 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-400/30">
                 <Calendar className="w-4 h-4" />
               </div>
               <div>
                 <span className="text-slate-400 block font-medium">Dates</span>
-                <span className="font-bold text-slate-800">{trip.startDate} - {trip.endDate}</span>
+                <span className="font-bold text-white">{trip.startDate} - {trip.endDate}</span>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600 border border-purple-100">
+              <div className="p-2.5 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-400/30">
                 <Clock className="w-4 h-4" />
               </div>
               <div>
                 <span className="text-slate-400 block font-medium">Duration</span>
-                <span className="font-bold text-slate-800">{trip.duration} {trip.duration === 1 ? 'Day' : 'Days'}</span>
+                <span className="font-bold text-white">{trip.duration} {trip.duration === 1 ? 'Day' : 'Days'}</span>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+              <div className="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30">
                 <Users className="w-4 h-4" />
               </div>
               <div>

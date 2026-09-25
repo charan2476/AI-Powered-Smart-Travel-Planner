@@ -198,17 +198,28 @@ export const PlanTripPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10 lg:py-14">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-900 py-10 lg:py-14 relative overflow-hidden text-slate-900">
+      {/* High-Quality Travel Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1503220317375-aaad61436b1b?auto=format&fit=crop&w=2000&q=80"
+          alt="Scenic Travel Mountain Vista"
+          className="w-full h-full object-cover object-center opacity-25 brightness-90 transform scale-105"
+        />
+        {/* Dark Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/95 via-slate-900/90 to-slate-950/95" />
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header Banner */}
-        <div className="text-center max-w-2xl mx-auto mb-8">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-50 text-sky-700 text-xs font-bold mb-3 border border-sky-100 shadow-xs">
-            <Sparkles className="w-3.5 h-3.5 text-sky-500" /> AI Itinerary Builder
+        <div className="text-center max-w-2xl mx-auto mb-8 text-white">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/20 text-sky-300 text-xs font-bold mb-3 border border-sky-400/30 shadow-xs backdrop-blur-md">
+            <Sparkles className="w-3.5 h-3.5 text-sky-400" /> AI Itinerary Builder
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mb-2">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight mb-2">
             Plan Your Next Adventure
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500">
+          <p className="text-xs sm:text-sm text-slate-300">
             Tell us your destination and preferences. Our AI will curate a tailored, paced daily itinerary in seconds.
           </p>
         </div>
@@ -216,41 +227,41 @@ export const PlanTripPage = () => {
         {/* Guided Step Progress Indicator */}
         <div className="max-w-2xl mx-auto mb-10">
           <div className="flex items-center justify-between relative">
-            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-200 -translate-y-1/2 z-0" />
+            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-700 -translate-y-1/2 z-0" />
             
             <div className="flex flex-col items-center relative z-10">
-              <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shadow-md">
+              <div className="w-8 h-8 rounded-full bg-sky-500 text-white font-bold text-xs flex items-center justify-center shadow-lg ring-4 ring-slate-900">
                 1
               </div>
-              <span className="text-[11px] font-bold text-slate-700 mt-1.5">Destination</span>
+              <span className="text-[11px] font-bold text-slate-200 mt-1.5">Destination</span>
             </div>
 
             <div className="flex flex-col items-center relative z-10">
-              <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shadow-md">
+              <div className="w-8 h-8 rounded-full bg-sky-500 text-white font-bold text-xs flex items-center justify-center shadow-lg ring-4 ring-slate-900">
                 2
               </div>
-              <span className="text-[11px] font-bold text-slate-700 mt-1.5">Dates</span>
+              <span className="text-[11px] font-bold text-slate-200 mt-1.5">Dates</span>
             </div>
 
             <div className="flex flex-col items-center relative z-10">
-              <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shadow-md">
+              <div className="w-8 h-8 rounded-full bg-sky-500 text-white font-bold text-xs flex items-center justify-center shadow-lg ring-4 ring-slate-900">
                 3
               </div>
-              <span className="text-[11px] font-bold text-slate-700 mt-1.5">Travelers</span>
+              <span className="text-[11px] font-bold text-slate-200 mt-1.5">Travelers</span>
             </div>
 
             <div className="flex flex-col items-center relative z-10">
-              <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shadow-md">
+              <div className="w-8 h-8 rounded-full bg-sky-500 text-white font-bold text-xs flex items-center justify-center shadow-lg ring-4 ring-slate-900">
                 4
               </div>
-              <span className="text-[11px] font-bold text-slate-700 mt-1.5">Budget</span>
+              <span className="text-[11px] font-bold text-slate-200 mt-1.5">Budget</span>
             </div>
 
             <div className="flex flex-col items-center relative z-10">
-              <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shadow-md">
+              <div className="w-8 h-8 rounded-full bg-sky-500 text-white font-bold text-xs flex items-center justify-center shadow-lg ring-4 ring-slate-900">
                 5
               </div>
-              <span className="text-[11px] font-bold text-slate-700 mt-1.5">Style</span>
+              <span className="text-[11px] font-bold text-slate-200 mt-1.5">Style</span>
             </div>
           </div>
         </div>

@@ -43,76 +43,86 @@ export const LandingPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900 overflow-hidden">
-      {/* Modern Hero Section without Vanta.js */}
-      <section className="relative pt-12 pb-20 lg:pt-20 lg:pb-28 overflow-hidden bg-gradient-to-b from-sky-50/80 via-white to-slate-50">
-        {/* Soft background ambient gradient glows */}
-        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-gradient-to-tr from-sky-300/25 via-blue-200/20 to-teal-200/25 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/3 -right-20 w-[350px] h-[350px] bg-indigo-200/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-10 -left-20 w-[350px] h-[350px] bg-sky-200/20 rounded-full blur-3xl pointer-events-none" />
+      {/* Full-Screen Travel Hero Section with Dark Gradient Overlay */}
+      <section className="relative min-h-[90vh] flex items-center justify-center pt-14 pb-20 lg:pt-20 lg:pb-28 overflow-hidden bg-slate-950 text-white">
+        {/* Full-Viewport Travel Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=2000&q=80"
+            alt="Scenic Mountain Road Trip Travel Horizon"
+            className="w-full h-full object-cover object-center transform scale-105 transition-transform duration-1000 brightness-90"
+          />
+          {/* Dark / Gradient Overlay for Maximum Text Contrast & Readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/85 via-slate-900/75 to-slate-950/95" />
+          <div className="absolute inset-0 bg-radial-at-c from-transparent via-slate-950/30 to-slate-950/80 pointer-events-none" />
+        </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Ambient Glowing Highlights */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-sky-500/15 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <div className="text-center max-w-3xl mx-auto">
             {/* Pill Tag */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-sky-200/80 text-sky-800 text-xs sm:text-sm font-bold shadow-soft mb-6 animate-in fade-in slide-in-from-top-3 duration-500">
-              <Sparkles className="w-4 h-4 text-sky-500 animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-sky-400/40 text-sky-300 text-xs sm:text-sm font-bold shadow-soft mb-6 animate-in fade-in slide-in-from-top-3 duration-500">
+              <Sparkles className="w-4 h-4 text-sky-400 animate-pulse" />
               <span>Next-Gen AI Travel Platform</span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 leading-[1.1] mb-6">
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.1] mb-6 drop-shadow-md">
               PLAN LESS.{' '}
-              <span className="bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
                 TRAVEL MORE.
               </span>
             </h1>
 
             {/* Subheadline */}
-            <p className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto font-normal leading-relaxed mb-9">
+            <p className="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto font-normal leading-relaxed mb-9 drop-shadow-sm">
               Your AI-powered travel companion for smarter, faster and personalized trip planning.
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 max-w-md mx-auto mb-14">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 max-w-md mx-auto mb-12">
               <Link to="/plan" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto text-base shadow-glow px-8" icon={Sparkles}>
+                <Button size="lg" className="w-full sm:w-auto text-base shadow-glow px-8 font-bold" icon={Sparkles}>
                   Plan My Trip
                 </Button>
               </Link>
               <Link to="/explore" className="w-full sm:w-auto">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto text-base px-6" icon={Globe}>
+                <Button variant="outline" size="lg" className="w-full sm:w-auto text-base px-6 bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-md" icon={Globe}>
                   Explore Destinations
                 </Button>
               </Link>
             </div>
           </div>
 
-          {/* Interactive Travel Composition Showcase */}
+          {/* Interactive Travel Composition Showcase Card */}
           <div className="relative max-w-4xl mx-auto mt-4">
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-card relative overflow-hidden">
+            <div className="bg-slate-900/85 backdrop-blur-2xl rounded-3xl p-6 sm:p-10 border border-white/15 shadow-2xl relative overflow-hidden text-white">
               <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
                 {/* Left Side: Real-time Feature Snapshot */}
                 <div className="space-y-4 max-w-md text-left">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-bold border border-sky-100">
-                    <Compass className="w-3.5 h-3.5" /> Interactive AI Experience
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 text-xs font-bold border border-sky-400/30">
+                    <Compass className="w-3.5 h-3.5 text-sky-400" /> Interactive AI Experience
                   </div>
-                  <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                  <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                     Personalized trips built around you
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                     Simply enter your budget, dates, and favorite interests. Our Gemini AI constructs timed daily schedules, local gems, and cost breakdowns in seconds.
                   </p>
 
                   <div className="flex flex-wrap gap-2 pt-1">
-                    <span className="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold">
+                    <span className="px-3 py-1 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-200 text-xs font-semibold">
                       🏝️ Beaches
                     </span>
-                    <span className="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold">
+                    <span className="px-3 py-1 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-200 text-xs font-semibold">
                       🍜 Culinary Walks
                     </span>
-                    <span className="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold">
+                    <span className="px-3 py-1 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-200 text-xs font-semibold">
                       🏛️ Cultural Heritage
                     </span>
-                    <span className="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold">
+                    <span className="px-3 py-1 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-200 text-xs font-semibold">
                       ⛰️ Mountain Treks
                     </span>
                   </div>
@@ -123,14 +133,14 @@ export const LandingPage = () => {
                   <InteractiveGlobe size={280} />
 
                   {/* Floating Micro Cards */}
-                  <div className="absolute -top-2 -left-4 sm:-left-8 bg-white/95 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200 shadow-md flex items-center gap-2 animate-float">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
-                    <span className="text-[11px] font-bold text-slate-800">Goa · 4 Days Planned</span>
+                  <div className="absolute -top-2 -left-4 sm:-left-8 bg-slate-900/90 backdrop-blur-md p-2.5 rounded-2xl border border-white/20 shadow-xl flex items-center gap-2 animate-float">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                    <span className="text-[11px] font-bold text-white">Goa · 4 Days Planned</span>
                   </div>
 
-                  <div className="absolute -bottom-3 -right-4 sm:-right-6 bg-white/95 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200 shadow-md flex items-center gap-2 animate-float" style={{ animationDelay: '1.5s' }}>
-                    <Sparkles className="w-3.5 h-3.5 text-sky-500" />
-                    <span className="text-[11px] font-bold text-slate-800">AI Budget Optimized</span>
+                  <div className="absolute -bottom-3 -right-4 sm:-right-6 bg-slate-900/90 backdrop-blur-md p-2.5 rounded-2xl border border-white/20 shadow-xl flex items-center gap-2 animate-float" style={{ animationDelay: '1.5s' }}>
+                    <Sparkles className="w-3.5 h-3.5 text-sky-400" />
+                    <span className="text-[11px] font-bold text-white">AI Budget Optimized</span>
                   </div>
                 </div>
               </div>
@@ -139,29 +149,29 @@ export const LandingPage = () => {
 
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-8">
-            <div className="flex items-center gap-3 p-3.5 bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-soft">
-              <div className="p-2 rounded-xl bg-sky-50 text-sky-600 border border-sky-100">
+            <div className="flex items-center gap-3 p-3.5 bg-slate-900/75 backdrop-blur-md rounded-2xl border border-white/10 shadow-soft">
+              <div className="p-2 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-400/30">
                 <Zap className="w-4 h-4" />
               </div>
-              <span className="text-xs font-bold text-slate-800 text-left">Instant 5s Generation</span>
+              <span className="text-xs font-bold text-slate-200 text-left">Instant 5s Generation</span>
             </div>
-            <div className="flex items-center gap-3 p-3.5 bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-soft">
-              <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+            <div className="flex items-center gap-3 p-3.5 bg-slate-900/75 backdrop-blur-md rounded-2xl border border-white/10 shadow-soft">
+              <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30">
                 <DollarSign className="w-4 h-4" />
               </div>
-              <span className="text-xs font-bold text-slate-800 text-left">Smart Budget Allocation</span>
+              <span className="text-xs font-bold text-slate-200 text-left">Smart Budget Allocation</span>
             </div>
-            <div className="flex items-center gap-3 p-3.5 bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-soft">
-              <div className="p-2 rounded-xl bg-purple-50 text-purple-600 border border-purple-100">
+            <div className="flex items-center gap-3 p-3.5 bg-slate-900/75 backdrop-blur-md rounded-2xl border border-white/10 shadow-soft">
+              <div className="p-2 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-400/30">
                 <Bot className="w-4 h-4" />
               </div>
-              <span className="text-xs font-bold text-slate-800 text-left">24/7 AI Concierge</span>
+              <span className="text-xs font-bold text-slate-200 text-left">24/7 AI Concierge</span>
             </div>
-            <div className="flex items-center gap-3 p-3.5 bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-soft">
-              <div className="p-2 rounded-xl bg-amber-50 text-amber-600 border border-amber-100">
+            <div className="flex items-center gap-3 p-3.5 bg-slate-900/75 backdrop-blur-md rounded-2xl border border-white/10 shadow-soft">
+              <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-400/30">
                 <Sliders className="w-4 h-4" />
               </div>
-              <span className="text-xs font-bold text-slate-800 text-left">100% Customizable</span>
+              <span className="text-xs font-bold text-slate-200 text-left">100% Customizable</span>
             </div>
           </div>
         </div>

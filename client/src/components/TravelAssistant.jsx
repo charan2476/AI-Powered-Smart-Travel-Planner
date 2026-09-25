@@ -110,8 +110,17 @@ export const TravelAssistant = ({ tripContext }) => {
       {/* Floating Chat Drawer */}
       {isOpen && (
         <div className="fixed bottom-5 right-5 sm:right-6 z-50 w-[94vw] sm:w-[440px] h-[580px] max-h-[86vh] bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
+          {/* Subtle Travel Watermark Pattern */}
+          <div
+            className="absolute inset-0 opacity-[0.02] pointer-events-none bg-repeat bg-center"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M60 10 L65 25 L80 25 L68 35 L72 50 L60 40 L48 50 L52 35 L40 25 L55 25 Z M10 80 A5 5 0 1 1 10 70 A5 5 0 1 1 10 80 Z M110 90 A4 4 0 1 1 110 82 A4 4 0 1 1 110 90 Z' fill='%230284c7'/%3E%3C/svg%3E")`,
+              backgroundSize: '120px 120px',
+            }}
+          />
+
           {/* Header */}
-          <div className="px-5 py-4 bg-gradient-to-r from-slate-900 via-slate-800 to-navy-900 text-white flex items-center justify-between border-b border-slate-700/60">
+          <div className="px-5 py-4 bg-gradient-to-r from-slate-900 via-slate-800 to-navy-900 text-white flex items-center justify-between border-b border-slate-700/60 relative z-10">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sky-400 shadow-inner">
                 <Bot className="w-5 h-5" />
@@ -136,7 +145,7 @@ export const TravelAssistant = ({ tripContext }) => {
           </div>
 
           {/* Messages Body */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3.5 bg-slate-50/70">
+          <div className="flex-1 p-4 overflow-y-auto space-y-3.5 bg-slate-50/70 relative z-10">
             {messages.map((msg) => (
               <div
                 key={msg.id}

@@ -49,11 +49,26 @@ export const ExplorePage = () => {
   }, [searchQuery, selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8 lg:py-14">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header Hero Banner */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-950 via-slate-900 to-navy-950 text-white p-8 sm:p-12 mb-10 shadow-card border border-slate-800">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-slate-50 py-8 lg:py-14 relative overflow-hidden">
+      {/* Subtle Travel Destination Watermark */}
+      <div
+        className="absolute inset-0 opacity-[0.025] pointer-events-none bg-repeat bg-center"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M60 10 L65 25 L80 25 L68 35 L72 50 L60 40 L48 50 L52 35 L40 25 L55 25 Z M10 80 A5 5 0 1 1 10 70 A5 5 0 1 1 10 80 Z M110 90 A4 4 0 1 1 110 82 A4 4 0 1 1 110 90 Z' fill='%230284c7'/%3E%3C/svg%3E")`,
+          backgroundSize: '160px 160px',
+        }}
+      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Header Hero Banner with Destination Background */}
+        <div className="relative overflow-hidden rounded-3xl bg-slate-950 text-white p-8 sm:p-12 mb-10 shadow-card border border-slate-800">
+          <img
+            src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80"
+            alt="World Destination Explore"
+            className="absolute inset-0 w-full h-full object-cover object-center opacity-25 brightness-90"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-navy-950/85" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/15 rounded-full blur-3xl pointer-events-none" />
           
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
             <div className="lg:col-span-2 space-y-4">
@@ -70,7 +85,7 @@ export const ExplorePage = () => {
             </div>
 
             <div className="hidden lg:flex justify-end items-center">
-              <div className="w-48 h-48 rounded-2xl overflow-hidden shadow-2xl border border-sky-500/30 bg-slate-900/60 backdrop-blur-md">
+              <div className="w-48 h-48 rounded-2xl overflow-hidden shadow-2xl border border-sky-500/30 bg-slate-900/70 backdrop-blur-md">
                 <InteractiveGlobe />
               </div>
             </div>
