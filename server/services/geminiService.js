@@ -149,8 +149,8 @@ export const generateItinerary = async (params) => {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    // Use gemini-1.5-flash or gemini-2.0-flash
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    // Use gemini-3.8-flash
+    const model = genAI.getGenerativeModel({ model: 'gemini-3.8-flash' });
 
     const prompt = `
 You are an expert, world-class travel planner for the application TripGenie.
@@ -246,7 +246,7 @@ export const askTravelAssistant = async ({ message, tripContext }) => {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-3.8-flash' });
 
     const prompt = `
 You are TripGenie, a friendly, concise, and highly knowledgeable AI travel concierge assistant.
