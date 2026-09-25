@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { destinationService } from '../services/destinationService';
-import { Search, Globe, Filter, Sparkles, MapPin } from 'lucide-react';
+import { Search, Globe, Filter, Sparkles, MapPin, Compass, ArrowRight } from 'lucide-react';
 import Input from '../components/Input';
 import DestinationCard from '../components/DestinationCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
+import InteractiveGlobe from '../components/InteractiveGlobe';
 
 export const ExplorePage = () => {
   const [destinations, setDestinations] = useState([]);
@@ -48,19 +49,32 @@ export const ExplorePage = () => {
   }, [searchQuery, selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10 lg:py-16">
+    <div className="min-h-screen bg-slate-50 py-8 lg:py-14">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header banner */}
-        <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-50 text-sky-700 text-xs font-semibold mb-3 border border-sky-100">
-            <Globe className="w-3.5 h-3.5 text-sky-500" /> Explore Iconic Destinations
+        {/* Header Hero Banner */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-950 via-slate-900 to-navy-950 text-white p-8 sm:p-12 mb-10 shadow-card border border-slate-800">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+            <div className="lg:col-span-2 space-y-4">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/20 text-sky-300 text-xs font-bold border border-sky-400/30 backdrop-blur-md">
+                <Globe className="w-3.5 h-3.5 text-sky-400" />
+                Curated Travel Catalog
+              </div>
+              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
+                Explore Your Next Adventure 🌍
+              </h1>
+              <p className="text-sm sm:text-base text-slate-300 max-w-xl leading-relaxed">
+                Handpicked travel destinations with curated local insights, weather guides, estimated budgets, and instant 1-click AI itinerary creation.
+              </p>
+            </div>
+
+            <div className="hidden lg:flex justify-end items-center">
+              <div className="w-48 h-48 rounded-2xl overflow-hidden shadow-2xl border border-sky-500/30 bg-slate-900/60 backdrop-blur-md">
+                <InteractiveGlobe />
+              </div>
+            </div>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
-            Discover Your Next Dream Gateway
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Browse through handpicked locations with curated travel tips, approximate budgets, and instant AI trip generation.
-          </p>
         </div>
 
         {/* Search & Category Filter Controls */}
@@ -85,10 +99,10 @@ export const ExplorePage = () => {
                   type="button"
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                  className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                     active
-                      ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-sky-500 text-white shadow-md shadow-sky-500/30 ring-2 ring-sky-300/40'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
                   }`}
                 >
                   {cat}
@@ -115,7 +129,7 @@ export const ExplorePage = () => {
         ) : (
           <div>
             <div className="flex items-center justify-between mb-6">
-              <span className="text-xs font-semibold text-slate-500">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Showing {destinations.length} destination{destinations.length === 1 ? '' : 's'}
               </span>
             </div>

@@ -19,6 +19,9 @@ import {
   Luggage,
   Info,
   Clock,
+  PieChart,
+  ListOrdered,
+  Bot,
 } from 'lucide-react';
 import Button from '../components/Button';
 import Card from '../components/Card';
@@ -37,6 +40,7 @@ export const TripDetailsPage = () => {
 
   const [trip, setTrip] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('itinerary'); // 'itinerary' | 'budget' | 'tips'
 
   // Modals state
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -181,34 +185,34 @@ export const TripDetailsPage = () => {
     <div className="min-h-screen bg-slate-50 py-8 lg:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Link */}
-        <div className="mb-6">
+        <div className="mb-5">
           <Link
             to="/dashboard"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </Link>
         </div>
 
         {/* Hero Header Banner */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-soft mb-8">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-card mb-8 relative overflow-hidden">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2 mb-2">
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-100">
                   {trip.travelStyle} Style
                 </span>
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
                   {trip.status}
                 </span>
                 {trip.interests && trip.interests.length > 0 && (
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-slate-500 font-medium">
                     Interests: {trip.interests.join(', ')}
                   </span>
                 )}
               </div>
 
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight flex items-center gap-2">
                 <MapPin className="w-7 h-7 text-sky-500 flex-shrink-0" />
                 {trip.destination}
               </h1>
@@ -219,7 +223,7 @@ export const TripDetailsPage = () => {
             </div>
 
             {/* Quick Action buttons */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
               <Link to={`/trips/${trip._id}/edit`}>
                 <Button variant="outline" size="sm" icon={Edit}>
                   Edit Trip
@@ -239,7 +243,7 @@ export const TripDetailsPage = () => {
           {/* Quick Stats Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-100 text-xs">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-sky-50 text-sky-600">
+              <div className="p-2.5 rounded-xl bg-sky-50 text-sky-600 border border-sky-100">
                 <Calendar className="w-4 h-4" />
               </div>
               <div>
@@ -249,7 +253,7 @@ export const TripDetailsPage = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600">
+              <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600 border border-purple-100">
                 <Clock className="w-4 h-4" />
               </div>
               <div>
@@ -259,7 +263,7 @@ export const TripDetailsPage = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
+              <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
                 <Users className="w-4 h-4" />
               </div>
               <div>
@@ -269,7 +273,7 @@ export const TripDetailsPage = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-600">
+              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-600 border border-amber-100">
                 <DollarSign className="w-4 h-4" />
               </div>
               <div>
@@ -280,96 +284,157 @@ export const TripDetailsPage = () => {
           </div>
         </div>
 
-        {/* Main Content Grid: Left (Itinerary Timeline), Right (Budget & Tips) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column: Itinerary Days */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-extrabold text-slate-900">Day-by-Day Schedule</h2>
-                <p className="text-xs text-slate-500">
-                  Customized activities curated for your {trip.travelStyle.toLowerCase()} trip
-                </p>
+        {/* Navigation Tabs (Itinerary, Budget, Tips) */}
+        <div className="flex items-center gap-2 mb-8 border-b border-slate-200 pb-3 overflow-x-auto">
+          <button
+            type="button"
+            onClick={() => setActiveTab('itinerary')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === 'itinerary'
+                ? 'bg-sky-500 text-white shadow-md shadow-sky-500/25'
+                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+            }`}
+          >
+            <ListOrdered className="w-4 h-4" />
+            <span>Itinerary Timeline</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('budget')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === 'budget'
+                ? 'bg-sky-500 text-white shadow-md shadow-sky-500/25'
+                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+            }`}
+          >
+            <PieChart className="w-4 h-4" />
+            <span>Budget Breakdown</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('tips')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === 'tips'
+                ? 'bg-sky-500 text-white shadow-md shadow-sky-500/25'
+                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+            }`}
+          >
+            <Luggage className="w-4 h-4" />
+            <span>Packing & Tips</span>
+          </button>
+        </div>
+
+        {/* Tab 1: Itinerary */}
+        {activeTab === 'itinerary' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-black text-slate-900">Day-by-Day Schedule</h2>
+                  <p className="text-xs text-slate-500">
+                    Customized time-of-day activities for your {trip.travelStyle.toLowerCase()} journey
+                  </p>
+                </div>
+                <span className="text-xs font-bold px-3 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-100">
+                  {trip.days?.length || 0} Days
+                </span>
               </div>
-              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-100">
-                {trip.days?.length || 0} Days
-              </span>
+
+              {trip.days && trip.days.length > 0 ? (
+                trip.days.map((dayData) => (
+                  <ItineraryDay
+                    key={dayData.day}
+                    dayData={dayData}
+                    currency={trip.currency}
+                    onAddActivity={handleOpenAddActivity}
+                    onEditActivity={handleOpenEditActivity}
+                    onDeleteActivity={handleDeleteActivity}
+                  />
+                ))
+              ) : (
+                <div className="p-8 text-center bg-white rounded-2xl border border-dashed border-slate-300 text-xs text-slate-500">
+                  No itinerary days found. You can regenerate the itinerary from the Edit Trip page.
+                </div>
+              )}
             </div>
 
-            {trip.days && trip.days.length > 0 ? (
-              trip.days.map((dayData) => (
-                <ItineraryDay
-                  key={dayData.day}
-                  dayData={dayData}
-                  currency={trip.currency}
-                  onAddActivity={handleOpenAddActivity}
-                  onEditActivity={handleOpenEditActivity}
-                  onDeleteActivity={handleDeleteActivity}
-                />
-              ))
-            ) : (
-              <div className="p-8 text-center bg-white rounded-2xl border border-dashed border-slate-300 text-xs text-slate-500">
-                No itinerary days found. You can regenerate the itinerary from the Edit Trip page.
-              </div>
-            )}
+            {/* Sidebar Summary on Itinerary Tab */}
+            <div className="space-y-6">
+              {trip.destinationSummary && (
+                <Card glassEffect className="p-6">
+                  <h3 className="text-sm font-black text-slate-900 mb-2 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-sky-500" /> Destination Overview
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                    {trip.destinationSummary}
+                  </p>
+                </Card>
+              )}
+
+              <BudgetBreakdown
+                breakdown={trip.budgetBreakdown}
+                totalBudget={trip.budget}
+                currency={trip.currency}
+              />
+            </div>
           </div>
+        )}
 
-          {/* Right Column: Overview, Budget, Tips */}
-          <div className="space-y-6">
-            {/* Destination Summary Card */}
-            {trip.destinationSummary && (
-              <Card className="p-6">
-                <h3 className="text-sm font-bold text-slate-800 mb-2 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-sky-500" /> Destination Overview
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  {trip.destinationSummary}
-                </p>
-              </Card>
-            )}
-
-            {/* Budget Breakdown Component */}
+        {/* Tab 2: Budget */}
+        {activeTab === 'budget' && (
+          <div className="max-w-3xl mx-auto">
             <BudgetBreakdown
               breakdown={trip.budgetBreakdown}
               totalBudget={trip.budget}
               currency={trip.currency}
             />
+          </div>
+        )}
 
+        {/* Tab 3: Packing & Local Tips */}
+        {activeTab === 'tips' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Packing Suggestions */}
-            {trip.packingSuggestions && trip.packingSuggestions.length > 0 && (
-              <Card className="p-6">
-                <h3 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2">
-                  <Luggage className="w-4 h-4 text-emerald-500" /> Packing Suggestions
-                </h3>
-                <ul className="space-y-2 text-xs text-slate-600">
-                  {trip.packingSuggestions.map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
-                      <span>{item}</span>
+            <Card glassEffect className="p-6">
+              <h3 className="text-base font-black text-slate-900 mb-4 flex items-center gap-2">
+                <Luggage className="w-5 h-5 text-emerald-500" /> Packing Suggestions
+              </h3>
+              <ul className="space-y-2.5 text-xs text-slate-600">
+                {trip.packingSuggestions && trip.packingSuggestions.length > 0 ? (
+                  trip.packingSuggestions.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                      <span className="font-medium">{item}</span>
                     </li>
-                  ))}
-                </ul>
-              </Card>
-            )}
+                  ))
+                ) : (
+                  <li className="text-slate-400 italic">No packing suggestions specified.</li>
+                )}
+              </ul>
+            </Card>
 
             {/* Travel Tips */}
-            {trip.travelTips && trip.travelTips.length > 0 && (
-              <Card className="p-6">
-                <h3 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2">
-                  <Lightbulb className="w-4 h-4 text-amber-500" /> Local Travel Tips
-                </h3>
-                <ul className="space-y-2 text-xs text-slate-600">
-                  {trip.travelTips.map((tipItem, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <Info className="w-3.5 h-3.5 text-amber-500 mt-0.5 flex-shrink-0" />
-                      <span>{tipItem}</span>
+            <Card glassEffect className="p-6">
+              <h3 className="text-base font-black text-slate-900 mb-4 flex items-center gap-2">
+                <Lightbulb className="w-5 h-5 text-amber-500" /> Local Travel Tips
+              </h3>
+              <ul className="space-y-2.5 text-xs text-slate-600">
+                {trip.travelTips && trip.travelTips.length > 0 ? (
+                  trip.travelTips.map((tipItem, idx) => (
+                    <li key={idx} className="flex items-start gap-2.5 bg-amber-50/50 p-3 rounded-xl border border-amber-100">
+                      <Info className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                      <span className="font-medium">{tipItem}</span>
                     </li>
-                  ))}
-                </ul>
-              </Card>
-            )}
+                  ))
+                ) : (
+                  <li className="text-slate-400 italic">No travel tips specified.</li>
+                )}
+              </ul>
+            </Card>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Floating Travel Assistant Widget */}
@@ -444,7 +509,7 @@ export const TripDetailsPage = () => {
           />
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
               Description / Notes
             </label>
             <textarea
@@ -454,7 +519,7 @@ export const TripDetailsPage = () => {
                 setActivityForm({ ...activityForm, description: e.target.value })
               }
               placeholder="Additional details, directions, or ticket notes..."
-              className="w-full rounded-xl border border-slate-200 p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-200 focus:border-sky-500"
+              className="w-full rounded-xl border border-slate-200 p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-200 focus:border-sky-500 font-medium"
             />
           </div>
 

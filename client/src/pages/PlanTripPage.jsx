@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
 import { aiService } from '../services/aiService';
 import { tripService } from '../services/tripService';
@@ -17,6 +17,10 @@ import {
   AlertCircle,
   Globe,
   Sliders,
+  ArrowRight,
+  Plane,
+  ChevronRight,
+  Luggage,
 } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -57,15 +61,17 @@ export const PlanTripPage = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationStep, setGenerationStep] = useState(1);
 
+  const quickDestinations = ['Goa', 'Manali', 'Jaipur', 'Tokyo', 'Paris', 'Kerala', 'Dubai', 'Bali'];
+
   const travelStyles = [
-    'Relaxed',
-    'Adventure',
-    'Luxury',
-    'Budget',
-    'Family',
-    'Romantic',
-    'Cultural',
-    'Food & Exploration',
+    { name: 'Relaxed', icon: '☕', desc: 'Leisurely pace & serene spots' },
+    { name: 'Adventure', icon: '🧗', desc: 'Thrills, hikes & outdoor action' },
+    { name: 'Luxury', icon: '💎', desc: 'Fine dining & premium comfort' },
+    { name: 'Budget', icon: '🎒', desc: 'Maximum value & smart savings' },
+    { name: 'Family', icon: '👨‍👩‍👧', desc: 'Child-friendly & fun for all' },
+    { name: 'Romantic', icon: '🥂', desc: 'Intimate vibes & scenic views' },
+    { name: 'Cultural', icon: '🏛️', desc: 'History, heritage & art tours' },
+    { name: 'Food & Exploration', icon: '🍜', desc: 'Street eats & foodie markets' },
   ];
 
   const interestOptions = [
@@ -192,194 +198,330 @@ export const PlanTripPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10 lg:py-16 relative">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Page Header */}
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-50 text-sky-700 text-xs font-bold mb-3 border border-sky-100 shadow-xs">
+    <div className="min-h-screen bg-slate-50 py-10 lg:py-14">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header Banner */}
+        <div className="text-center max-w-2xl mx-auto mb-8">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-50 text-sky-700 text-xs font-bold mb-3 border border-sky-100 shadow-xs">
             <Sparkles className="w-3.5 h-3.5 text-sky-500" /> AI Itinerary Builder
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mb-3">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mb-2">
             Plan Your Next Adventure
           </h1>
           <p className="text-xs sm:text-sm text-slate-500">
-            Customize your travel preferences below. Our AI will curate a personalized day-by-day itinerary with budget allocation.
+            Tell us your destination and preferences. Our AI will curate a tailored, paced daily itinerary in seconds.
           </p>
         </div>
 
-        {/* Form Card */}
-        <Card glassEffect className="p-6 sm:p-10 shadow-card border-slate-200/90">
-          <form onSubmit={handleGenerate} className="space-y-8">
-            {/* Section 1: Destination */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
-                <MapPin className="w-4 h-4 text-sky-500" /> 1. Where are you going?
-              </h3>
-              <Input
-                label="Destination City or Country"
-                placeholder="e.g. Goa, Manali, Jaipur, Tokyo, Paris, Bali"
-                icon={MapPin}
-                value={formData.destination}
-                onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-                error={errors.destination}
-                required
-              />
+        {/* Guided Step Progress Indicator */}
+        <div className="max-w-2xl mx-auto mb-10">
+          <div className="flex items-center justify-between relative">
+            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-200 -translate-y-1/2 z-0" />
+            
+            <div className="flex flex-col items-center relative z-10">
+              <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shadow-md">
+                1
+              </div>
+              <span className="text-[11px] font-bold text-slate-700 mt-1.5">Destination</span>
             </div>
 
-            {/* Section 2: Dates & Duration */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-sky-500" /> 2. When are you traveling?
-                </h3>
-                {duration > 0 && (
-                  <span className="text-xs font-bold text-sky-600 bg-sky-50 px-3 py-1 rounded-full border border-sky-100">
-                    ⏱️ Total: {duration} {duration === 1 ? 'Day' : 'Days'}
+            <div className="flex flex-col items-center relative z-10">
+              <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shadow-md">
+                2
+              </div>
+              <span className="text-[11px] font-bold text-slate-700 mt-1.5">Dates</span>
+            </div>
+
+            <div className="flex flex-col items-center relative z-10">
+              <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shadow-md">
+                3
+              </div>
+              <span className="text-[11px] font-bold text-slate-700 mt-1.5">Travelers</span>
+            </div>
+
+            <div className="flex flex-col items-center relative z-10">
+              <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shadow-md">
+                4
+              </div>
+              <span className="text-[11px] font-bold text-slate-700 mt-1.5">Budget</span>
+            </div>
+
+            <div className="flex flex-col items-center relative z-10">
+              <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center shadow-md">
+                5
+              </div>
+              <span className="text-[11px] font-bold text-slate-700 mt-1.5">Style</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Form Layout: Left Form (2 cols) + Right Live Preview (1 col) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <Card glassEffect className="p-6 sm:p-9 shadow-card border-slate-200/90">
+              <form onSubmit={handleGenerate} className="space-y-8">
+                {/* Step 1: Destination */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2.5">
+                    <MapPin className="w-4 h-4 text-sky-500" /> 1. Destination
+                  </h3>
+                  
+                  <Input
+                    label="Where are you going?"
+                    placeholder="e.g. Goa, Manali, Jaipur, Tokyo, Paris, Bali"
+                    icon={MapPin}
+                    value={formData.destination}
+                    onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
+                    error={errors.destination}
+                    required
+                  />
+
+                  {/* Quick Select Chips */}
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    <span className="text-[11px] font-bold text-slate-400 mr-1 uppercase">Popular:</span>
+                    {quickDestinations.map((dest) => (
+                      <button
+                        type="button"
+                        key={dest}
+                        onClick={() => setFormData({ ...formData, destination: dest })}
+                        className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 hover:bg-sky-50 hover:text-sky-700 text-slate-600 border border-slate-200/80 transition-colors cursor-pointer"
+                      >
+                        {dest}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Step 2: Dates & Duration */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                    <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-sky-500" /> 2. Dates & Duration
+                    </h3>
+                    {duration > 0 && (
+                      <span className="text-xs font-bold text-sky-600 bg-sky-50 px-3 py-1 rounded-full border border-sky-100">
+                        ⏱️ Total: {duration} {duration === 1 ? 'Day' : 'Days'}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Input
+                      label="Start Date"
+                      type="date"
+                      value={formData.startDate}
+                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                      error={errors.startDate}
+                      required
+                    />
+                    <Input
+                      label="End Date"
+                      type="date"
+                      value={formData.endDate}
+                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                      error={errors.endDate}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Step 3: Travelers & Budget */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2.5">
+                    <Users className="w-4 h-4 text-sky-500" /> 3. Group Size & Budget
+                  </h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <Input
+                      label="Travelers"
+                      type="number"
+                      min="1"
+                      max="20"
+                      icon={Users}
+                      value={formData.travelers}
+                      onChange={(e) => setFormData({ ...formData, travelers: e.target.value })}
+                      error={errors.travelers}
+                      required
+                    />
+
+                    <Input
+                      label="Total Budget"
+                      type="number"
+                      min="1"
+                      icon={DollarSign}
+                      value={formData.budget}
+                      onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                      error={errors.budget}
+                      required
+                    />
+
+                    <Select
+                      label="Currency"
+                      options={currencies}
+                      value={formData.currency}
+                      onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                {/* Step 4: Travel Style */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2.5">
+                    <Compass className="w-4 h-4 text-sky-500" /> 4. Travel Style
+                  </h3>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {travelStyles.map((style) => {
+                      const isSelected = formData.travelStyle === style.name;
+                      return (
+                        <button
+                          type="button"
+                          key={style.name}
+                          onClick={() => setFormData({ ...formData, travelStyle: style.name })}
+                          className={`p-3.5 rounded-2xl text-left border text-xs font-bold transition-all duration-300 cursor-pointer select-none active:scale-95 ${
+                            isSelected
+                              ? 'btn-shimmer border-sky-500 bg-sky-50 text-sky-900 shadow-md shadow-sky-500/20 scale-[1.02]'
+                              : 'border-slate-200/90 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm">{style.icon}</span>
+                            {isSelected && <CheckCircle2 className="w-4 h-4 text-sky-600" />}
+                          </div>
+                          <div className="font-bold text-slate-900">{style.name}</div>
+                          <p className="text-[10px] text-slate-500 font-normal line-clamp-1 mt-0.5">
+                            {style.desc}
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Step 5: Interests */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2.5">
+                    <Heart className="w-4 h-4 text-rose-500" /> 5. Interests & Activities
+                  </h3>
+
+                  <MultiSelect
+                    options={interestOptions}
+                    selected={formData.interests}
+                    onChange={(newInterests) => setFormData({ ...formData, interests: newInterests })}
+                    helperText="Select all categories you want reflected in your itinerary activities."
+                  />
+                </div>
+
+                {/* Submit Action Button */}
+                <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="text-xs text-slate-500 font-medium">
+                    ✨ AI builds a structured {duration}-day schedule with time-of-day activities.
+                  </div>
+                  <Button
+                    type="submit"
+                    size="lg"
+                    variant="primary"
+                    isLoading={isGenerating}
+                    className="w-full sm:w-auto px-9 shadow-glow text-base font-bold"
+                    icon={Sparkles}
+                  >
+                    Generate My Trip ✨
+                  </Button>
+                </div>
+              </form>
+            </Card>
+          </div>
+
+          {/* Right Column: Live Trip Preview Card */}
+          <div className="space-y-6">
+            <Card glassEffect className="p-6 sticky top-24 border-slate-200/90 shadow-soft">
+              <h3 className="text-sm font-black text-slate-900 mb-4 flex items-center gap-2 border-b border-slate-100 pb-3">
+                <Luggage className="w-4 h-4 text-sky-600" /> Trip Blueprint Summary
+              </h3>
+
+              <div className="space-y-3.5 text-xs">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <span className="text-slate-400 font-medium">Destination:</span>
+                  <span className="font-bold text-slate-900">
+                    {formData.destination || 'Not selected yet'}
                   </span>
-                )}
+                </div>
+
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <span className="text-slate-400 font-medium">Duration:</span>
+                  <span className="font-bold text-slate-900">
+                    {duration} {duration === 1 ? 'Day' : 'Days'}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <span className="text-slate-400 font-medium">Group Size:</span>
+                  <span className="font-bold text-slate-900">
+                    {formData.travelers} {formData.travelers === 1 ? 'Traveler' : 'Travelers'}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <span className="text-slate-400 font-medium">Planned Budget:</span>
+                  <span className="font-bold text-emerald-600">
+                    {Number(formData.budget).toLocaleString()} {formData.currency}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <span className="text-slate-400 font-medium">Travel Style:</span>
+                  <span className="font-bold text-sky-700">
+                    {formData.travelStyle}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-slate-400 font-medium block mb-1.5">Selected Interests:</span>
+                  <div className="flex flex-wrap gap-1">
+                    {formData.interests.length > 0 ? (
+                      formData.interests.map((interest) => (
+                        <span
+                          key={interest}
+                          className="px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 font-semibold text-[11px] border border-sky-100"
+                        >
+                          {interest}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-slate-400 italic">None selected</span>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  label="Start Date"
-                  type="date"
-                  value={formData.startDate}
-                  onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                  error={errors.startDate}
-                  required
-                />
-                <Input
-                  label="End Date"
-                  type="date"
-                  value={formData.endDate}
-                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                  error={errors.endDate}
-                  required
-                />
+              <div className="mt-6 pt-4 border-t border-slate-100 text-center">
+                <span className="text-[11px] text-slate-400 flex items-center justify-center gap-1">
+                  <Sparkles className="w-3 h-3 text-sky-500" /> Powered by Gemini AI
+                </span>
               </div>
-            </div>
-
-            {/* Section 3: Travelers & Budget */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
-                <Users className="w-4 h-4 text-sky-500" /> 3. Group Size & Budget
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <Input
-                  label="Travelers"
-                  type="number"
-                  min="1"
-                  max="20"
-                  icon={Users}
-                  value={formData.travelers}
-                  onChange={(e) => setFormData({ ...formData, travelers: e.target.value })}
-                  error={errors.travelers}
-                  required
-                />
-
-                <Input
-                  label="Total Budget"
-                  type="number"
-                  min="1"
-                  icon={DollarSign}
-                  value={formData.budget}
-                  onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                  error={errors.budget}
-                  required
-                />
-
-                <Select
-                  label="Currency"
-                  options={currencies}
-                  value={formData.currency}
-                  onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                />
-              </div>
-            </div>
-
-            {/* Section 4: Travel Style */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
-                <Compass className="w-4 h-4 text-sky-500" /> 4. Travel Style
-              </h3>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {travelStyles.map((style) => {
-                  const isSelected = formData.travelStyle === style;
-                  return (
-                    <button
-                      type="button"
-                      key={style}
-                      onClick={() => setFormData({ ...formData, travelStyle: style })}
-                      className={`p-3.5 rounded-2xl text-left border text-xs font-bold transition-all duration-300 cursor-pointer select-none active:scale-95 ${
-                        isSelected
-                          ? 'btn-shimmer border-sky-500 bg-sky-50 text-sky-900 shadow-md shadow-sky-500/20 scale-[1.02]'
-                          : 'border-slate-200/90 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span>{style}</span>
-                        {isSelected && <CheckCircle2 className="w-4 h-4 text-sky-600" />}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Section 5: Interests */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
-                <Heart className="w-4 h-4 text-rose-500" /> 5. What are you interested in?
-              </h3>
-
-              <MultiSelect
-                options={interestOptions}
-                selected={formData.interests}
-                onChange={(newInterests) => setFormData({ ...formData, interests: newInterests })}
-                helperText="Select all activities that you would like included in your daily itinerary."
-              />
-            </div>
-
-            {/* Submit Button */}
-            <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-xs text-slate-500 font-medium">
-                ✨ AI will structure a complete {duration}-day schedule with cost breakdown.
-              </div>
-              <Button
-                type="submit"
-                size="lg"
-                variant="primary"
-                isLoading={isGenerating}
-                className="w-full sm:w-auto px-9 shadow-glow text-base"
-                icon={Sparkles}
-              >
-                Generate My Trip ✨
-              </Button>
-            </div>
-          </form>
-        </Card>
+            </Card>
+          </div>
+        </div>
       </div>
 
-      {/* AI Generating High-Tech Loading Modal */}
+      {/* AI Generating Loading Modal */}
       {isGenerating && (
         <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="glass-dark rounded-3xl p-8 max-w-md w-full text-center shadow-2xl border border-white/10 space-y-6 text-white">
-            <div className="flex justify-center -mb-4">
-              <FloatingTravelAsset size={130} />
+            <div className="w-16 h-16 rounded-full border-4 border-sky-400/30 border-t-sky-400 animate-spin mx-auto flex items-center justify-center">
+              <Compass className="w-7 h-7 text-sky-400 animate-pulse" />
             </div>
 
             <div>
               <h3 className="text-xl font-black text-white mb-1.5 tracking-tight">
-                Creating your personalized itinerary...
+                TripGenie is planning your adventure...
               </h3>
               <p className="text-xs text-slate-300">
-                Tailoring activities, estimating budgets, and optimizing routes for {formData.destination}.
+                Pacing activities, allocating budgets, and tailoring routes for {formData.destination}.
               </p>
             </div>
 
-            {/* Animated generation progress steps */}
+            {/* Animated progress indicators */}
             <div className="space-y-2.5 text-left bg-white/5 p-4 rounded-2xl border border-white/10 text-xs">
               <div className="flex items-center gap-2.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
@@ -402,7 +544,7 @@ export const PlanTripPage = () => {
                   <Loader2 className="w-4 h-4 text-sky-400 animate-spin flex-shrink-0" />
                 )}
                 <span className={generationStep >= 3 ? 'text-slate-200 font-medium' : 'text-slate-400'}>
-                  Compiling day-by-day activities & packing tips
+                  Compiling day-by-day activities & local tips
                 </span>
               </div>
             </div>

@@ -17,6 +17,9 @@ import {
   Trash2,
   AlertTriangle,
   Bot,
+  Lightbulb,
+  Plane,
+  Clock,
   Luggage,
 } from 'lucide-react';
 import Button from '../components/Button';
@@ -98,31 +101,40 @@ export const DashboardPage = () => {
   const upcomingTripsList = trips.filter((t) => t.status === 'Upcoming');
   const highlightedTrip = upcomingTripsList.length > 0 ? upcomingTripsList[0] : null;
 
+  // Calculate dynamic greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 py-8 lg:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Welcome Hero Banner with 3D Globe */}
-        <div className="bg-gradient-to-r from-slate-950 via-navy-900 to-slate-900 rounded-3xl p-6 sm:p-10 text-white shadow-card relative overflow-hidden mb-10 border border-slate-800">
+        {/* Command Center Hero Banner */}
+        <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-navy-900 rounded-3xl p-6 sm:p-10 text-white shadow-card relative overflow-hidden mb-8 border border-slate-800">
           <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+          
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-            <div className="space-y-4 max-w-2xl">
+            <div className="space-y-3.5 max-w-xl">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/20 text-sky-300 text-xs font-bold border border-sky-400/30">
-                <Sparkles className="w-3.5 h-3.5" /> AI Travel Dashboard
+                <Sparkles className="w-3.5 h-3.5" /> Travel Command Center
               </div>
               
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
-                Welcome back, {user?.name || 'Traveler'} 👋
+                {getGreeting()}, {user?.name || 'Traveler'} 👋
               </h1>
 
-              <p className="text-sm sm:text-base text-slate-300 font-normal leading-relaxed">
-                Plan your next adventure with AI. View your itineraries, monitor your travel budget, and get instant answers from your concierge.
+              <p className="text-xs sm:text-sm text-slate-300 font-normal leading-relaxed">
+                Where are you going next? Plan intelligent itineraries, monitor travel expenditures, and explore world destinations with Gemini AI.
               </p>
 
-              {/* Quick Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
+              {/* Quick Actions */}
+              <div className="flex flex-wrap items-center gap-2.5 pt-2">
                 <Link to="/plan">
-                  <Button size="md" variant="primary" icon={Sparkles} className="shadow-glow">
-                    Plan New Trip
+                  <Button size="md" variant="primary" icon={PlusCircle} className="shadow-glow font-bold">
+                    + Create New Trip
                   </Button>
                 </Link>
                 <Link to="/explore">
@@ -138,15 +150,15 @@ export const DashboardPage = () => {
               </div>
             </div>
 
-            {/* 3D Interactive Globe */}
+            {/* 3D Interactive Globe Element */}
             <div className="flex-shrink-0 flex items-center justify-center">
-              <InteractiveGlobe size={260} />
+              <InteractiveGlobe size={240} />
             </div>
           </div>
         </div>
 
         {/* 4 Key Statistics Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
           <StatCard
             title="Total Trips"
             value={stats.totalTrips}
@@ -164,12 +176,12 @@ export const DashboardPage = () => {
           <StatCard
             title="Completed"
             value={stats.completedTrips}
-            subtitle="Past journeys"
+            subtitle="Past vacations"
             icon={CheckCircle2}
             color="purple"
           />
           <StatCard
-            title="Planned Budget"
+            title="Total Planned Budget"
             value={`$${stats.totalPlannedBudget.toLocaleString()}`}
             subtitle="Across all trips"
             icon={DollarSign}
@@ -177,35 +189,55 @@ export const DashboardPage = () => {
           />
         </div>
 
+        {/* AI Travel Insight Card */}
+        {highlightedTrip && (
+          <div className="mb-8 p-5 bg-gradient-to-r from-sky-50 via-blue-50 to-indigo-50 rounded-2xl border border-sky-100 flex items-start gap-3.5 shadow-xs">
+            <div className="w-9 h-9 rounded-xl bg-sky-500 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+              <Lightbulb className="w-5 h-5" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-sky-900 mb-0.5 flex items-center gap-1.5">
+                AI Travel Insight for {highlightedTrip.destination}
+                <Sparkles className="w-3 h-3 text-sky-600" />
+              </h3>
+              <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                {highlightedTrip.travelTips && highlightedTrip.travelTips.length > 0
+                  ? highlightedTrip.travelTips[0]
+                  : `Based on your upcoming ${highlightedTrip.travelStyle.toLowerCase()} trip to ${highlightedTrip.destination}, consider visiting major sights in the morning to enjoy pleasant weather and beat the afternoon crowds!`}
+              </p>
+            </div>
+          </div>
+        )}
+
         {loading ? (
           <LoadingSpinner message="Loading your travel dashboard..." fullPage />
         ) : (
-          <div className="space-y-12">
-            {/* Highlighted Upcoming Trip Banner (if available) */}
+          <div className="space-y-10">
+            {/* Upcoming Trip Highlight (if any) */}
             {highlightedTrip && (
               <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <Sparkles className="w-4 h-4 text-sky-600" />
-                  <h2 className="text-lg font-extrabold text-slate-900">Upcoming Journey</h2>
+                <div className="flex items-center gap-2 mb-3.5">
+                  <Plane className="w-4 h-4 text-sky-600" />
+                  <h2 className="text-lg font-black text-slate-900">Upcoming Journey</h2>
                 </div>
 
-                <div className="bg-gradient-to-r from-sky-900 via-blue-900 to-indigo-950 rounded-3xl p-6 sm:p-8 text-white shadow-card relative overflow-hidden border border-sky-500/20">
+                <div className="bg-gradient-to-r from-slate-900 via-sky-950 to-blue-950 rounded-3xl p-6 sm:p-8 text-white shadow-card relative overflow-hidden border border-slate-800">
                   <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                    <div className="space-y-2.5">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-sky-200 text-xs font-bold border border-white/20 backdrop-blur-xs">
+                    <div className="space-y-2">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-sky-300 text-xs font-bold border border-white/20 backdrop-blur-xs">
                         {highlightedTrip.travelStyle} Escape
                       </span>
-                      <h3 className="text-2xl sm:text-3xl font-black flex items-center gap-2">
-                        <MapPin className="w-7 h-7 text-sky-400 flex-shrink-0" />
+                      <h3 className="text-2xl sm:text-3xl font-black flex items-center gap-2 text-white">
+                        <MapPin className="w-6 h-6 text-sky-400 flex-shrink-0" />
                         {highlightedTrip.destination}
                       </h3>
-                      <p className="text-xs sm:text-sm text-sky-100/90 max-w-xl line-clamp-2">
+                      <p className="text-xs sm:text-sm text-slate-300 max-w-xl line-clamp-2">
                         {highlightedTrip.destinationSummary ||
                           highlightedTrip.tripTitle ||
                           'Get ready for an exciting journey tailored to your interests!'}
                       </p>
                       <div className="flex flex-wrap items-center gap-4 text-xs text-sky-200 pt-1 font-medium">
-                        <span>📅 {highlightedTrip.startDate} to {highlightedTrip.endDate}</span>
+                        <span>📅 {highlightedTrip.startDate} – {highlightedTrip.endDate}</span>
                         <span>⏱️ {highlightedTrip.duration} Days</span>
                         <span>👥 {highlightedTrip.travelers} Travelers</span>
                         <span className="font-bold text-white">💰 {highlightedTrip.budget?.toLocaleString()} {highlightedTrip.currency}</span>
@@ -216,10 +248,10 @@ export const DashboardPage = () => {
                       <Link to={`/trips/${highlightedTrip._id}`}>
                         <Button
                           size="lg"
-                          className="bg-white text-slate-900 hover:bg-slate-100 shadow-xl font-bold"
+                          className="bg-white text-slate-900 hover:bg-slate-100 shadow-xl font-bold text-sm px-6"
                           icon={ArrowRight}
                         >
-                          View Full Itinerary
+                          View Full Trip
                         </Button>
                       </Link>
                     </div>
@@ -228,13 +260,13 @@ export const DashboardPage = () => {
               </div>
             )}
 
-            {/* All Trips Grid */}
+            {/* Saved Trips Section */}
             <div>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-xl font-extrabold text-slate-900">Your Saved Trips</h2>
+                  <h2 className="text-xl font-black text-slate-900">Your Saved Trips</h2>
                   <p className="text-xs text-slate-500">
-                    Manage, customize, and explore your generated itineraries
+                    Manage, customize, and review your day-by-day itineraries
                   </p>
                 </div>
                 <span className="text-xs font-bold px-3 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-100">
@@ -267,14 +299,14 @@ export const DashboardPage = () => {
               <div className="pt-6 border-t border-slate-200/80">
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h2 className="text-xl font-extrabold text-slate-900">Trending Destinations</h2>
+                    <h2 className="text-xl font-black text-slate-900">Trending Destinations</h2>
                     <p className="text-xs text-slate-500">
-                      Looking for inspiration? Check out top travel hubs
+                      Looking for inspiration? Browse popular travel spots
                     </p>
                   </div>
                   <Link to="/explore">
                     <Button variant="outline" size="sm" icon={ArrowRight}>
-                      View All
+                      View All Destinations
                     </Button>
                   </Link>
                 </div>
